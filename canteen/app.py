@@ -3,6 +3,10 @@ from flask import render_template
 from flask import request
 from flask import jsonify
 
+import sys
+sys.path.append(".")
+import config
+
 app = Flask(__name__)
 
 @app.route('/menus')
