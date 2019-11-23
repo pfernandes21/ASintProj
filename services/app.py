@@ -54,8 +54,7 @@ def APIShowService(serviceid):
 def APICreateService():
     if request.is_json:
         try:
-            print(request.json)
-            db.addService(request.json['location'],request.json['name'],request.json['description'],request.json['open time'])
+            db.addService(request.json['location'],request.json['name'],request.json['description'],request.json['openTime'])
         except:
             resp = jsonify("Unsuccess")
             resp.status_code = 400
@@ -83,7 +82,10 @@ def APIDeleteService(serviceid):
 def APIChangeService(serviceid):
     if request.is_json:
         print(request.json)
-        flag = db.changeService(serviceid,request.json['key'],request.json['value'])
+        try:
+            flag = db.changeService(serviceid,request.json['key'].capitalize(),request.json['value'])
+        except:
+            flag = "Wrong Json"
         if flag == "Wrong ID":
             resp = jsonify("Wrong ID")
             resp.status_code = 400

@@ -2,11 +2,11 @@ import uuid
 import pickle
 
 class Service:
-    def __init__(self,Location,Name,Description,OpeningHours):
+    def __init__(self,Location,Name,Description,OpenTime):
         self.Location = Location
         self.Name = Name
         self.Description = Description
-        self.OpeningHours = OpeningHours
+        self.OpenTime = OpenTime
         self.id = str(uuid.uuid1())
 
 class DBService:
@@ -26,23 +26,43 @@ class DBService:
         pickle.dump(self.db, f)
         f.close()
 
-        print(self.db)
-        print("elemento inserido")
-        print(self.db[service.id])
-        print(service.id)
-
     def rmService(self,id):
         del self.db[id]
         f = open('serviceDB'+self.name, 'wb')
         pickle.dump(self.db, f)
         f.close()
 
+    def changeService(self,id,key,value):
+        try:
+            service = self.db[id]
+        except:
+            return "Wrong ID"
+        try:
+            if key.lower() == "location": 
+                service.Location = value
+            elif key.lower() == "name": 
+                service.Name = value
+            elif key.lower() == "description": 
+                service.Description = value
+            elif key.lower() == "opentime": 
+                service.OpenTime = value
+        except:
+            return "Wrong Json"
+        f = open('serviceDB'+self.name, 'wb')
+        pickle.dump(self.db, f)
+        f.close()
+        return "Success"
+
     def listAllServices(self):
         services = {}
         flag = True
 
         for key in self.db:
-            services[self.db[key].Name] = key
+            services[self.db[key].Location] = []
+            
+
+        for key in self.db:
+            services[self.db[key].Location].append(key)
             flag = False
         
         if flag:
