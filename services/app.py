@@ -46,7 +46,7 @@ def APIShowService(serviceid):
         resp = jsonify("Not Found")
         resp.status_code = 400
         return resp
-    resp = jsonify(service.__dict__)
+    resp = jsonify(format_message(service.__dict__))
     resp.status_code = 200
     return resp
 
@@ -63,6 +63,9 @@ def APICreateService():
         resp = jsonify("Success")
         resp.status_code = 200
         return resp
+    resp = jsonify("No JSON")
+    resp.status_code = 400
+    return resp
 
 @app.route('/service/<serviceid>', methods=['DELETE'])
 def APIDeleteService(serviceid):
@@ -79,15 +82,34 @@ def APIDeleteService(serviceid):
 @app.route('/service/<serviceid>', methods=['PUT'])
 def APIChangeService(serviceid):
     if request.is_json:
-        try:
-            print(request.data)
-        except:
-            resp = jsonify("Unsuccess")
-            resp.status_code = 404
-            return resp
-        resp = jsonify("Success")
-        resp.status_code = 404
+        print(request.json)
+        flag = db.changeService(serviceid,request.json['key'],request.json['value'])
+        if flag == "Wrong ID":
+            resp = jsonify("Wrong ID")
+            resp.status_code = 400
+        elif flag == "Wrong Json":
+            resp = jsonify("JSON format Wrong")
+            resp.status_code = 400
+        else:    
+            resp = jsonify("Success")
+            resp.status_code = 200
         return resp
+    resp = jsonify("No JSON")
+    resp.status_code = 400
+    return resp
+
+def format_message(old):
+    new = {}
+    new["type"] = {}
+    for key in old:
+        if key.lower() == "name":
+            new[key] = old[key]
+            continue
+        if key.lower() != "id":
+            new["type"][key] = old[key]
+    return new
+
+
 
 if __name__ == '__main__':
     # app.run()

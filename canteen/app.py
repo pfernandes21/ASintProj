@@ -9,13 +9,24 @@ import config
 
 app = Flask(__name__)
 
-@app.route('/menus')
+# @app.route('/menus')
 
-@app.route('/menus/type')
+# @app.route('/menus/type')
 
-@app.route('/menus/<date:menudate>')
+# @app.route('/menus/<date:menudate>')
 
-@app.route('/menus/type/<date:menudate>')
+# @app.route('/menus/type/<date:menudate>')
+
+def format_message(old):
+    new = {}
+    new["type"] = {}
+    for key in old:
+        if key.lower() == "name":
+            new[key] = old[key]
+            continue
+        if key.lower() != "id":
+            new["type"][key] = old[key]
+    return new
 
 if __name__ == '__main__':
     # app.run()
