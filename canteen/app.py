@@ -86,17 +86,17 @@ def APIMenusByTypeByDay(type,menudate):
 def format_message(old,type,date):
     new = {}
     new["name"] = "Canteen"
-    new["type"] = {}
+    new["info"] = {}
     for key in old:
         if date != None and date != key["day"]:
             continue
-        new["type"][key["day"]]={}
+        new["info"][key["day"]]={}
         for element in key['meal']:
             if type != None and type.capitalize() != element['type']:
                 continue
-            new["type"][key["day"]][element['type']] = []
+            new["info"][key["day"]][element['type']] = []
             for element1 in element['info']:
-                new["type"][key['day']][element['type']].append(element1['name']) # Também posso pôr em lista
+                new["info"][key['day']][element['type']].append(element1['name']) # Também posso pôr em lista
     return new
 
 def format_date(numero):

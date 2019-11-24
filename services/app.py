@@ -102,13 +102,13 @@ def APIChangeService(serviceid):
 
 def format_message(old):
     new = {}
-    new["type"] = {}
+    new["info"] = {}
     for key in old:
         if key.lower() == "name":
             new[key] = old[key]
             continue
         if key.lower() != "id":
-            new["type"][key] = old[key]
+            new["info"][key] = old[key]
     return new
 
 
