@@ -107,4 +107,6 @@ def format_date(numero):
 
 if __name__ == '__main__':
     # app.run()
-    app.run(debug=True)
+    # app.run(debug=True)
+    cfg = config.Canteen()
+    app.run(debug=True, host=cfg.host, port=cfg.port)

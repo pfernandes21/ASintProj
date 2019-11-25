@@ -92,4 +92,6 @@ def format_message(old):
 
 if __name__ == '__main__':
     # app.run()
-    app.run(debug=True)
+    cfg = config.Rooms()
+    app.run(debug=True, host=cfg.host, port=cfg.port)
+    # app.run(debug=True)
