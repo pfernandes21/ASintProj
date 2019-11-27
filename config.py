@@ -17,3 +17,8 @@ class Backend:
    def  __init__(self):
        self.host = '127.0.0.1'
        self.port = 5000
+
+class Log:
+   def  __init__(self):
+       self.host = '127.0.0.1'
+       self.port = 5002
