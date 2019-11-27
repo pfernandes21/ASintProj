@@ -61,11 +61,80 @@ def room(roomid):
 
     return resp
 
-# @app.route('/room/<int:roomid>/events/<eventtype>')
+@app.route('/room/<int:roomid>/events/<eventtype>')
+def room_event_type(roomid, eventtype):
+    r = requests.get(URI + "/" + str(roomid))
+    data = r.json()
 
-# @app.route('/room/<int:roomid>/events/<date:eventdate>')
+    if(data['type'] != 'ROOM'):
+        resp = jsonify("Not Found")
+        resp.status_code = 404
+        return resp
 
-# @app.route('/room/<int:roomid>/events/<eventtype>/<date:eventdate>')
+    data = get_events(data, eventtype, None)
+
+    try:
+        resp = jsonify(data)
+        resp.status_code = 200
+    except Exception as e:
+        print(e)
+        resp = jsonify("Unsuccess")
+        resp.status_code = 400
+
+    return resp
+
+@app.route('/room/<int:roomid>/events/<date:eventdate>')
+def room_event_date(roomid, eventdate):
+    r = requests.get(URI + "/" + str(roomid))
+    data = r.json()
+
+    if(data['type'] != 'ROOM'):
+        resp = jsonify("Not Found")
+        resp.status_code = 404
+        return resp
+
+    data = get_events(data, None, eventdate)
+
+    try:
+        resp = jsonify(data)
+        resp.status_code = 200
+    except Exception as e:
+        print(e)
+        resp = jsonify("Unsuccess")
+        resp.status_code = 400
+
+    return resp
+
+@app.route('/room/<int:roomid>/events/<eventtype>/<date:eventdate>')
+def room_event_type_date(roomid, eventtype, eventdate):
+    r = requests.get(URI + "/" + str(roomid))
+    data = r.json()
+
+    if(data['type'] != 'ROOM'):
+        resp = jsonify("Not Found")
+        resp.status_code = 404
+        return resp
+
+    data = get_events(data, eventtype, eventdate)
+
+    try:
+        resp = jsonify(data)
+        resp.status_code = 200
+    except Exception as e:
+        print(e)
+        resp = jsonify("Unsuccess")
+        resp.status_code = 400
+
+    return resp
+
+def get_events(room, type, date):
+    target_events = []
+    events = room['events']
+    for event in events:
+        if(event['type'] == type or event['day'] == date):
+            target_events.append(format_message(event))
+    
+    return target_events
 
 def getRooms(building_data):
     rooms = []
