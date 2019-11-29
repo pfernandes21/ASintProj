@@ -18,7 +18,10 @@ uri = "http://%s:%d/logs"%(Log.host,Log.port)
 @app.before_request
 def log():
     data = {}
-    data['data'] = ('Server %s %s')%(  request.method, request.url)
+    log = {}
+    log['dia'] = date.today().strftime("%d/%m/%Y")
+    log['info'] = ('Server %s %s')%(request.method, request.url)
+    data['data'] = log
     r = requests.post(uri, json=data)
     print(r.text)
 

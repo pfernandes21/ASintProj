@@ -23,7 +23,10 @@ URI = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen"
 @app.before_request
 def log():
     data = {}
-    data['data'] = ('Canteen %s %s')%(  request.method, request.url)
+    log = {}
+    log['dia'] = date.today().strftime("%d/%m/%Y")
+    log['info'] = ('Canteen %s %s')%(request.method, request.url)
+    data['data'] = log
     r = requests.post(uri, json=data)
     print(r.text)
     

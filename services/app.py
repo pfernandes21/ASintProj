@@ -7,6 +7,7 @@ import sys
 sys.path.append(".")
 import config
 import requests
+from datetime import date
 
 app = Flask(__name__)
 db = DBService.DBService("MyLib")
@@ -17,7 +18,10 @@ uri = "http://%s:%d/logs"%(Log.host,Log.port)
 @app.before_request
 def log():
     data = {}
-    data['data'] = ('Services %s %s')%(  request.method, request.url)
+    log = {}
+    log['dia'] = date.today().strftime("%d/%m/%Y")
+    log['info'] = ('Services %s %s')%(request.method, request.url)
+    data['data'] = log
     r = requests.post(uri, json=data)
     print(r.text)
 
