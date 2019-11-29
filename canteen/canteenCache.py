@@ -24,12 +24,14 @@ class Cache:
 		return self.db
 
 	def checkCache(self,day):
+		
 		if self.db == {}:	
 			print("Não existe na Cache")
 			return False
-		if day in self.db['info'].keys():
-			print("Existe na Cache")
-			return True
-		else:
+		try:
+			if day in self.db['info'].keys():
+				print("Existe na Cache")
+				return True
+		except:
 			print("Não existe na Cache")
 			return False
