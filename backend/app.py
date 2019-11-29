@@ -12,6 +12,16 @@ import config
 
 app = Flask(__name__)
 
+Log = config.Log()
+uri = "http://%s:%d/logs"%(Log.host,Log.port)
+
+@app.before_request
+def log():
+    data = {}
+    data['data'] = ('Server %s %s')%(  request.method, request.url)
+    r = requests.post(uri, json=data)
+    print(r.text)
+
 ##################HTML/API###############################
 @app.route('/API/<path:path>')
 def get_dir(path):

@@ -6,20 +6,20 @@ import DBService
 import sys
 sys.path.append(".")
 import config
+import requests
 
 app = Flask(__name__)
 db = DBService.DBService("MyLib")
 
-# @app.errorhandler(404)
-# def not_found(error=None):
-#     message = {
-#             'status': 404,
-#             'message': 'Not Found: ' + request.url,
-#     }
-#     resp = jsonify(message)
-#     resp.status_code = 404
+Log = config.Log()
+uri = "http://%s:%d/logs"%(Log.host,Log.port)
 
-#     return resp
+@app.before_request
+def log():
+    data = {}
+    data['data'] = ('Services %s %s')%(  request.method, request.url)
+    r = requests.post(uri, json=data)
+    print(r.text)
 
 @app.route('/services')
 def APIListServices():

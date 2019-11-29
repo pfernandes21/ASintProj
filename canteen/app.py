@@ -3,6 +3,7 @@ from flask import render_template
 from flask import request
 from flask import jsonify
 import requests
+import json
 
 import canteenCache
 
@@ -14,8 +15,19 @@ import config
 
 app = Flask(__name__)
 db = canteenCache.Cache("MyLib")
+Log = config.Log()
+uri = "http://%s:%d/logs"%(Log.host,Log.port)
 
-URI = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen" 
+URI = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen"
+
+@app.before_request
+def log():
+    data = {}
+    data['data'] = ('Canteen %s %s')%(  request.method, request.url)
+    r = requests.post(uri, json=data)
+    print(r.text)
+    
+
 
 @app.route('/menus')
 def APIMenus():
@@ -83,7 +95,7 @@ def APIMenusByTypeByDay(type,menudate):
         resp.status_code = 400
     return resp
 
-def format_message(old,type,date):
+def format_message(old,tipo,date):
     new = {}
     new["name"] = "Canteen"
     new["info"] = {}
@@ -92,7 +104,7 @@ def format_message(old,type,date):
             continue
         new["info"][key["day"]]={}
         for element in key['meal']:
-            if type != None and type.capitalize() != element['type']:
+            if tipo != None and tipo.capitalize() != element['type']:
                 continue
             new["info"][key["day"]][element['type']] = []
             for element1 in element['info']:

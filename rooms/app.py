@@ -10,10 +10,22 @@ import sys
 sys.path.append(".")
 import config
 
+import requests
+
 app = Flask(__name__)
 db = roomsCache.Cache("MyLib")
 
 URI = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces"
+
+Log = config.Log()
+uri = "http://%s:%d/logs"%(Log.host,Log.port)
+
+@app.before_request
+def log():
+    data = {}
+    data['data'] = ('Rooms %s %s')%(  request.method, request.url)
+    r = requests.post(uri, json=data)
+    print(r.text)
 
 @app.route('/building/<int:buildingid>/rooms')
 def buildings(buildingid):
