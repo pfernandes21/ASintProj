@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, flash
 from flask import render_template
-from flask import request
+from flask import request, session, abort
 from flask import jsonify
 import requests
+import os
 
 from datetime import date
 
@@ -31,10 +32,24 @@ def get_dir(path):
     return path
 
 ##################ADMIN/LOG################################
-#@app.route()
+@app.route('/admin')
+def admin_main():
+    if not session.get('logged_in'):
+        return render_template('login.html')
+    else:
+        return render_template('mainadmin.html')
+
+@app.route('/login', methods=['POST'])
+def do_admin_login():
+    if request.form['password'] == 'admin' and request.form['username'] == 'admin':
+        session['logged_in'] = True
+    else:
+        flash('wrong password!')
+    return admin_main()
 
 
 if __name__ == '__main__':
+    app.secret_key = os.urandom(12)
     # app.run()
     # app.run(debug=True)
     cfg = config.Backend()
