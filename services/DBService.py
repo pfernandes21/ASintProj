@@ -58,11 +58,11 @@ class DBService:
         flag = True
 
         for key in self.db:
-            services[self.db[key].Location] = []
+            services[self.db[key].Location] = {}
             
 
         for key in self.db:
-            services[self.db[key].Location].append(key)
+            services[self.db[key].Location][self.db[key].Name]= key
             flag = False
         
         if flag:
