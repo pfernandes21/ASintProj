@@ -16,6 +16,9 @@ app = Flask(__name__)
 Log = config.Log()
 uri = "http://%s:%d/logs"%(Log.host,Log.port)
 
+Service = config.Services()
+uriService = "http://%s:%d"%(Service.host,Service.port)
+
 @app.before_request
 def log():
     data = {}
@@ -52,10 +55,6 @@ def do_admin_login():
         flash('wrong password!')
     return redirect(url_for('admin_main'))
 
-@app.route("/admin/showServices")
-def showservices():
-    return "showservices"
-
 @app.route("/admin/showLogs", methods=['POST','GET'])
 def showLogs():
     try:
@@ -70,7 +69,41 @@ def showLogs():
 
 @app.route("/admin/queryLogs")
 def queryLogs():
-    return render_template("logs_query.html")
+    return render_template("logsQuery.html")
+
+@app.route("/admin/changeService")
+def changeService():
+    url = "%s/services"%(uriService)
+    r = requests.get(url)
+    if r.status_code != 200:
+        return redirect(url_for('admin_main'))
+    return render_template("changeShowService.html", service = r.json())
+
+@app.route("/admin/createService")
+def createService():
+    return render_template("serviceQuery.html")
+
+@app.route("/admin/addService", methods=['POST'])
+def addService():
+    data = {}
+    url = "%s/service"%(uriService)
+    try:
+        data['location'] = request.form['location']
+        data['name'] = request.form['name']
+        data['description'] = request.form['description']
+        data['openTime'] = request.form['openTime']
+        r = requests.post(url, json=data)
+    except:
+        return render_template("serviceQuery.html", obj = "Failed")
+    
+    if r.status_code == 200:
+        return render_template("serviceQuery.html", obj = "Success")
+    else:
+        return render_template("serviceQuery.html", obj = "Failed")
+
+@app.route("/admin/configFile")
+def configFile():
+    return render_template("serviceQuery.html")
 
 
 
