@@ -24,25 +24,40 @@ class Logs:
             self.db = pickle.load(f)
             f.close()
         except IOError:
-            self.db = []
+            self.db = {}
+        self.count = sum([len(self.db[x]) for x in self.db])
+        print("There are already %d elements"%(self.count))
 
     def add(self,log):
-        self.db.append(log)
+        try:
+            self.db[log['dia']].append(log['info'])
+        except:
+            self.db[log['dia']] = []
+            self.db[log['dia']].append(log['info'])
         f = open('LogDB'+self.name, 'wb')
         pickle.dump(self.db, f)
         f.close()
+        self.count += 1
 
     def showLogs(self):
         return  self.db
 
     def showNLogs(self,N):
-        log = []
+        log = {}
         print(N)
-        if len(self.db) > 0:
-            if N > len(self.db):
+        if self.count > 0:
+            if N > self.count:
                 return self.db
-            for i in range(N):
-                log.append(self.db[-1-i])
+            i = 0
+            keys = list(self.db.keys())
+            while i < N:
+                for key in reversed(keys):
+                    log[key] = []
+                    for info in reversed(self.db[key]):
+                        log[key].append(info)
+                        i += 1
+                        if i >= N:
+                            return log
         return log
 
 db = Logs("MyLib")
@@ -55,7 +70,7 @@ def showLogs():
         resp = jsonify(logs)
         resp.status_code = 200
     except:
-        resp = jsonify("Unuccess")
+        resp = jsonify("Unsuccess")
         resp.status_code = 400 
     return resp
     
@@ -70,7 +85,7 @@ def showNLogs(number):
             resp = jsonify(logs)
         resp.status_code = 200
     except:
-        resp = jsonify("Unuccess")
+        resp = jsonify("Unsuccess")
         resp.status_code = 400 
     return resp
     
