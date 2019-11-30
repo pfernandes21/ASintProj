@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Admin</title>
+    </head>
+    <body>
+        <h1>LOGS</h1>
+        <div>
+            <form action="/admin" method="get">
+                <input type="submit" value = 'Inicio'>
+        </div>
+        <div>
+            <h2>The logs are:</h2>
+            {% for key in logs %}
+                <ul>
+                    <h4>Day {{key}} </h4>
+                    {% for info in logs[key] %}
+                        <li> {{info}} </li>
+                    {% endfor %}
+                </ul>
+                
+            {% endfor %}
+        </div>
+    </body>
+</html>

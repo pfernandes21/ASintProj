@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Admin</title>
+    </head>
+    <body>
+        <div>
+            <h2>How many logs do you want to see?</h2>
+            <form action="/admin/showLogs" method="POST">
+                <input type="number" name="numberOfLogs" placeholder="Number of Logs">
+                <input type="submit" value="Show">
+            </form>
+        </div>
+        <div>
+            <h2> <a href="/admin/showLogs">Show all</a></h2>
+        </div>
+        <div>
+            <form action="/admin" method="get">
+                <input type="submit" value = 'Inicio'>
+        </div>
+    </body>
+</html>
