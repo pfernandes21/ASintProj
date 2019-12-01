@@ -12,10 +12,14 @@
             <h2>There are a new service.<br>You can submit a new service </h2>
         {% endif %}
 
+        {% if change == False %}
         <h1> Add a new Services</h1>
-            
         <form action="/admin/addService" method="post">
-
+        {% else %}
+        <h1> Change the properties of the service</h1>
+        <form action="/admin/changeService/{{ID}}" method="post">
+        {% endif %}
+    
             Name of the Service:    <input type="text" name="name"><br>
             Location of the Service:     <input type="text" name="location"><br>
             Description:    <input type="text" name="description"><br>
@@ -26,6 +30,7 @@
         <div>
             <form action="/admin" method="get">
                 <input type="submit" value = 'Inicio'>
+            </form>
         </div>
     </body>
 </html>
