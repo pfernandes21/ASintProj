@@ -87,7 +87,10 @@ def APIChangeService(serviceid):
     if request.is_json:
         print(request.json)
         try:
-            flag = db.changeService(serviceid,request.json['key'].capitalize(),request.json['value'])
+            for i in range(len(request.json['key'])):
+                flag = db.changeService(serviceid,request.json['key'][i],request.json['value'][i])
+                if flag == "Wrong ID" or flag == "Wrong Json":
+                    break
         except:
             flag = "Wrong Json"
         if flag == "Wrong ID":
