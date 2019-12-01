@@ -15,21 +15,25 @@
         {% endif %}
 
         <div>
-            {% for key in service %}
-                <ul>
-                    <li>Location: {{key}}</li>
+            {% if service != "None" %}
+                {% for key in service %}
                     <ul>
-                        {% for key1 in service[key] %}
-                            <li> 
-                                {{key1}}
-                                <a href="/admin/changeService/{{service[key][key1]}}">Change</a>
-                                <a href="/admin/deleteService/{{service[key][key1]}}">Delete</a>
-                            </li>
-                        {% endfor %}
+                        <li>Location: {{key}}</li>
+                        <ul>
+                            {% for key1 in service[key] %}
+                                <li> 
+                                    {{key1}}
+                                    <a href="/admin/changeService/{{service[key][key1]}}">Change</a>
+                                    <a href="/admin/deleteService/{{service[key][key1]}}">Delete</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </ul>
-                </ul>
-                
-            {% endfor %}
+                    
+                {% endfor %}
+            {% else %}
+                <h3>There are no Services to show</h3>
+            {% endif %}
         </div>
         <br>
         <div>
