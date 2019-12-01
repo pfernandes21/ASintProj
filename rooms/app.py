@@ -15,7 +15,7 @@ import requests
 from datetime import date
 
 app = Flask(__name__)
-db = roomsCache.Cache("MyLib")
+db = roomsCache.Cache("")
 
 URI = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces"
 

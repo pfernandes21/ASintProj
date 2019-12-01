@@ -60,7 +60,7 @@ class Logs:
                             return log
         return log
 
-db = Logs("MyLib")
+db = Logs("")
 
 
 @app.route('/logs')

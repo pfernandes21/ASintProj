@@ -14,7 +14,7 @@ sys.path.append(".")
 import config
 
 app = Flask(__name__)
-db = canteenCache.Cache("MyLib")
+db = canteenCache.Cache("")
 Log = config.Log()
 uri = "http://%s:%d/logs"%(Log.host,Log.port)
 

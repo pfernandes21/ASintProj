@@ -10,7 +10,7 @@ import requests
 from datetime import date
 
 app = Flask(__name__)
-db = DBService.DBService("MyLib")
+db = DBService.DBService("")
 
 Log = config.Log()
 uri = "http://%s:%d/logs"%(Log.host,Log.port)
