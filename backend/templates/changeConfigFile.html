@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Admin</title>
+        <style>
+            table, th, td {
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1> Escolha um Microserviço para alterar</h1>
+
+        {% if obj == "Failed" %}
+            <h2>You tried to change a Microservice but failed.<br>Try it again </h2>
+        {% endif %}
+        {% if obj == "Success" %}
+            <h2>The Microservice is changed.<br>You can change a new Microservice </h2>
+        {% endif %}
+        <div>
+            <form action="/admin" method="get">
+                <input type="submit" value = 'Inicio'>
+            </form>
+        </div>
+        <br>
+        <div>
+            {% if file != "None" %}
+                <table>
+                    <tr>
+                        <th>
+                            Name of Microservice
+                        </th>
+                        <th>
+                            URL
+                        </th>
+                    </tr>
+                    {% for key in file %}
+                        <tr> 
+                            <th>{{key}}</th>
+                            <th>{{file[key]}}</th>    
+                            <th>
+                                <form action="/admin/changeMicroservice/{{key}}" method="POST">
+                                    <input type="text" name="url" placeholder="URL of the Microservice">
+                                    <input type="submit" value = 'Change'>
+                                </form>
+                            </th>
+                            <th>
+                                <a href="/admin/deleteMicroservice/{{key}}">Delete</a>
+                            </th>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <h3>There are no Microservices to show</h3>
+            {% endif %}
+        </div>
+        <br>
+        <div>
+            <form action="/admin/addMicroservice" method="POST">
+                <input type="text" name="name" placeholder="Name of the Microservice">
+                <input type="text" name="url" placeholder="URL of the Microservice">
+                <input type="submit" value = 'Insert a new Microservice'>
+            </form>
+        </div>
+        
+    </body>
+</html>
