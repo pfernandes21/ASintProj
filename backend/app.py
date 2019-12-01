@@ -173,7 +173,7 @@ def addService():
 
 @app.route("/admin/configFile")
 def configFile():
-    return render_template("serviceQuery.html")
+    return "Não implementado"
 
 
 
