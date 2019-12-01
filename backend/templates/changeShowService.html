@@ -6,12 +6,36 @@
     </head>
     <body>
         <h1> Escolha um serviço para alterar</h1>
-        {{service}}
-        
+
+        {% if obj == "Failed" %}
+            <h2>You tried to change a service but failed.<br>Try it again </h2>
+        {% endif %}
+        {% if obj == "Success" %}
+            <h2>The service is changed.<br>You can change a new service </h2>
+        {% endif %}
+
+        <div>
+            {% for key in service %}
+                <ul>
+                    <li>Location: {{key}}</li>
+                    <ul>
+                        {% for key1 in service[key] %}
+                            <li> 
+                                {{key1}}
+                                <a href="/admin/changeService/{{service[key][key1]}}">Change</a>
+                                <a href="/admin/deleteService/{{service[key][key1]}}">Delete</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </ul>
+                
+            {% endfor %}
+        </div>
         <br>
         <div>
             <form action="/admin" method="get">
                 <input type="submit" value = 'Inicio'>
+            </form>
         </div>
     </body>
 </html>
