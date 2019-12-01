@@ -4,7 +4,7 @@ from flask import request, session, abort, redirect, url_for
 from flask import jsonify
 import requests
 import os
-import json
+import pickle
 
 from datetime import date
 
@@ -14,16 +14,28 @@ import config
 
 app = Flask(__name__)
 
-Log = config.Log()
-uri = "http://%s:%d/logs"%(Log.host,Log.port)
+def configFileInit():
+    try:
+        f = open('ConfigFile', 'rb')
+        table = pickle.load(f)
+        f.close()
+    except IOError:
+        table = config.dictMicroservices()
+        f = open('ConfigFile', 'wb')
+        pickle.dump(table, f)
+        f.close()
+    print("ConfigInit")
+    print(table)
+    return table
 
-Service = config.Services()
-uriService = "http://%s:%d"%(Service.host,Service.port)
+tableOfMicroservices = configFileInit()
+
 
 @app.before_request
 def log():
     data = {}
     log = {}
+    uri = "%s/logs"%(tableOfMicroservices['Log'])
     log['dia'] = date.today().strftime("%d/%m/%Y")
     log['info'] = ('Server %s %s')%(request.method, request.url)
     data['data'] = log
@@ -58,6 +70,7 @@ def do_admin_login():
 
 @app.route("/admin/showLogs", methods=['POST','GET'])
 def showLogs():
+    uri = "%s/logs"%(tableOfMicroservices['Log'])
     try:
         url = ("%s/%s")%(uri,str(request.form['numberOfLogs']))
     except:
@@ -80,7 +93,7 @@ def changeService():
     except:
         obj = None
 
-    url = "%s/services"%(uriService)
+    url = "%s/services"%(tableOfMicroservices['Services'])
     r = requests.get(url)
     if r.status_code != 200:
         return redirect(url_for('admin_main'))
@@ -92,7 +105,7 @@ def changeServiceQuery(id):
 
 @app.route("/admin/deleteService/<id>")
 def deleteService(id):
-    url = "%s/service/%s"%(uriService,id)
+    url = "%s/service/%s"%(tableOfMicroservices['Services'],id)
     r = requests.delete(url)
 
     if r.status_code == 200:
@@ -103,7 +116,6 @@ def deleteService(id):
 @app.route("/admin/changeService/<id>", methods=['POST'])
 def changeServicePost(id):
     data = {}
-    print(request.form)
     data['key'] = []
     data['value'] = []
     try:
@@ -123,9 +135,9 @@ def changeServicePost(id):
             data['key'].append('openTime')
             data['value'].append(request.form['openTime'])
     except:
-        return redirect(url_for('changeService',message = json.dumps("Failed")))
+        return redirect(url_for('changeService',message = "Failed"))
 
-    url = "%s/service/%s"%(uriService,id)
+    url = "%s/service/%s"%(tableOfMicroservices['Services'],id)
     r = requests.put(url,json=data)
 
     if r.status_code == 200:
@@ -140,7 +152,7 @@ def createService():
 @app.route("/admin/addService", methods=['POST'])
 def addService():
     data = {}
-    url = "%s/service"%(uriService)
+    url = "%s/service"%(tableOfMicroservices['Services'])
     allInfo = 0
     try:
         if request.form['location'] != '':
@@ -173,7 +185,55 @@ def addService():
 
 @app.route("/admin/configFile")
 def configFile():
-    return "Não implementado"
+    try:
+        obj = request.args['message']
+        print(obj)
+    except:
+        obj = None
+
+    return render_template("changeConfigFile.html", file = tableOfMicroservices, obj = obj)
+
+@app.route("/admin/changeMicroservice/<key>", methods=['POST'])
+def changeMicroservice(key):
+    global tableOfMicroservices
+    print("Change %s key %s"%(request.form['url'],key))
+    try:
+        if request.form['url'] != '':
+            tableOfMicroservices[key] = request.form['url']
+            f = open('ConfigFile', 'wb')
+            pickle.dump(tableOfMicroservices, f)
+            f.close()
+    except:
+        return redirect(url_for('configFile', message = "Failed"))
+
+    return redirect(url_for('configFile', message = "Success"))
+
+@app.route("/admin/deleteMicroservice/<key>")
+def deleteMicroservice(key):
+    global tableOfMicroservices
+    try:
+        del tableOfMicroservices[key]
+        f = open('ConfigFile', 'wb')
+        pickle.dump(tableOfMicroservices, f)
+        f.close()
+    except:
+        return redirect(url_for('configFile', message = "Failed"))
+
+    return redirect(url_for('configFile', message = "Success"))
+
+@app.route("/admin/addMicroservice", methods=['POST'])
+def addMicroservice():
+    global tableOfMicroservices
+    try:
+        if request.form['name'] != '' and request.form['url'] != '':
+            tableOfMicroservices[request.form['name']] = request.form['url']
+            f = open('ConfigFile', 'wb')
+            pickle.dump(tableOfMicroservices, f)
+            f.close()
+    except:
+        return redirect(url_for('configFile', message = "Failed"))
+
+    return redirect(url_for('configFile', message = "Success"))
 
 
 
