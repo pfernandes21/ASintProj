@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Title</title>
+
+
+
+
+    <script type="text/javascript">
+         //<![CDATA[
+         function check(myform) {
+            if (myform.term.value=="") {
+                alert("Please enter a search term!");
+                return false;
+            } else {
+                return true;
+            }
+        }
+        function changeFormat(){
+            var x = document.getElementsByTagName("h1");
+
+            for (var i = 0; i < x.length; i++) {
+                console.log("x");
+                x[i].style.backgroundColor = "red";
+}
+        }
+
+        function changeFormat2(){
+            var x = document.getElementsByTagName("h1");
+
+            for (var i = 0; i < x.length; i++) {
+                console.log("x");
+                x[i].style.backgroundColor = "yellow";
+}
+        }
+
+                //]]>
+  </script>
+
+</head>
+<body>
+
+
+    <h1>Input a search term</h1>
+
+    <form method="post" action="process" onsubmit="return check(this)">
+        <input type="text" name="term" size="20" />
+        <input type="submit" value="Search" />
+    </form>
+
+<input type="button" id="buttonFormat" onclick="changeFormat()" onmouseout="changeFormat2()" ></input>
+
+<h1> outro header</h1>
+</body>
+</html>

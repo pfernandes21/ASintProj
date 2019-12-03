@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Title</title>
+    <style type="text/css">
+
+    </style>
+   <link rel="stylesheet" href="jquery-ui.css"> </link>
+    <script src="jquery.js"></script>
+     <script src="jquery-ui.js"></script>
+
+</head>
+<body>
+
+
+<script>
+
+    $( document ).ready(function() {
+        $( "#ButtonClick" ).click(function( event ) {
+            $("#divDestiny").html($("#dateField").val());
+        });
+        $( "#ButtonClick2" ).click(function( event ) {
+            $( "#dateField" ).datepicker();
+        });
+    });
+</script>
+
+   <h1>Input a search term</h1>
+
+
+        <input type="text" name="" size="20" id="dateField" />
+        <input type="submit" value="Search" id="ButtonClick"> </input>
+
+    <div id="divDestiny">(this is where the text will go)</div>
+
+ <input type="button" value="" id="ButtonClick2"> </input>
+
+</body>
+</html>

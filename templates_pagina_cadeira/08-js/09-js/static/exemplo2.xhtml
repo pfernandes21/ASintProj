@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Title</title>
+
+
+
+
+    <script type="text/javascript">
+//<![CDATA[
+         function replace() {
+             var t = document.getElementById('dateField').value;
+             document.getElementById('divDestiny').innerHTML = t+"<br />"+ t;
+        }
+        //]]>
+  </script>
+
+</head>
+<body>
+
+
+    <h1>Input a search term</h1>
+
+
+        <input type="text" name="" size="20" id="dateField" />
+        <input type="submit" value="Search"  onclick="replace()"/>
+
+    <div id="divDestiny">(this is where the text will go)</div>
+
+</body>
+</html>

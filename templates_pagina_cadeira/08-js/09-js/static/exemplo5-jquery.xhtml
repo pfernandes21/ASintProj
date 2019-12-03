@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Title</title>
+    <style type="text/css">
+
+    </style>
+   <link rel="stylesheet" href="jquery-ui.css"> </link>
+    <script src="jquery.js"></script>
+     <script src="jquery-ui.js"></script>
+
+
+
+
+     <style>
+  .ui-autocomplete {
+    max-height: 100px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+  }
+  /* IE 6 doesn't support max-height
+   * we use height instead, but this forces the menu to always be this tall
+   */
+  * html .ui-autocomplete {
+    height: 100px;
+  }
+  </style>
+
+
+</head>
+<body>
+
+
+<script>
+       //<![CDATA[
+    $( document ).ready(function() {
+
+        $("#searchText").autocomplete();
+        $("#searchText").keyup(
+            function(event){
+                $.ajax({
+                    type: "POST",
+                    url: "/autocomplete",
+                    datatype: "json",
+                    contentType: "application/json",
+                    data: '{"str":"' + $("#searchText").val() + '"}',
+                    success: function (data) {
+                        $("#searchText").autocomplete({
+                            source: data
+                        });
+                        console.log(data);
+                        s = "<ol>";
+                        for (var i = 0, len = data.length; i < len; i++) {
+                            s += "<li>";
+                            s += data[i];
+                            s += "</li>";
+                        }
+                        s += "</ol>";
+                        $("#divDestiny").html(s);
+                    }
+                })
+
+
+            }
+
+        )
+
+
+
+        $( "#ButtonClick" ).click(function( event ) {
+            console.log("click");
+            $("#divDestiny").html("waiting");
+            $.ajax({
+                type: "POST",
+                url: "/search",
+                datatype: "json",
+                contentType: "application/json",
+                data: '{"str":"' + $("#searchText").val() + '"}',
+                success: function (data) {
+                    console.log(data);
+
+                    $("#divDestiny").html(data);
+                }
+            });
+        });
+    });
+        //]]>
+</script>
+
+   <h1>Input a search term</h1>
+
+
+        <input type="text" name="" size="20" id="searchText" />
+        <input type="submit" value="Search"  id="ButtonClick"/>
+
+    <div id="divDestiny">(this is where the text will go)</div>
+
+
+</body>
+</html>

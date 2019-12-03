@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Title</title>
+    <style type="text/css">
+
+    </style>
+   <link rel="stylesheet" href="jquery-ui.css"> </link>
+    <script src="jquery.js"></script>
+     <script src="jquery-ui.js"></script>
+
+</head>
+<body>
+
+
+<script>
+       //<![CDATA[
+    $( document ).ready(function() {
+        $("#searchText").keyup(
+            function(event){
+                $.ajax({
+                    type: "POST",
+                    url: "/autocomplete",
+                    datatype: "json",
+                    contentType: "application/json",
+                    data: '{"str":"' + $("#searchText").val() + '"}',
+                    success: function (data) {
+                        console.log(data);
+                        s = "<ol>";
+                        for (var i = 0, len = data.length; i < len; i++) {
+                            s += "<li>";
+                            s += data[i];
+                            s += "</li>";
+                        }
+                        s += "</ol>";
+                        $("#divDestiny").html(s);
+                    }
+                })
+
+
+            }
+
+        )
+
+
+
+        $( "#ButtonClick" ).click(function( event ) {
+            console.log("click");
+            $("#divDestiny").html("waiting");
+            $.ajax({
+                type: "GET",
+                url: "/allwords",
+                dataType: "json",
+                cache: false,
+                contentType: "application/json",
+                success: function (data) {
+                    console.log(data);
+                    s = "<ol>";
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        s += "<li>";
+                        s += data[i];
+                        s += "</li>";
+                    }
+                    s += "</ol>";
+                    $("#divDestiny").html(s);
+                }
+            });
+        });
+    });
+        //]]>
+</script>
+
+   <h1>Input a search term</h1>
+
+
+        <input type="text" name="" size="20" id="searchText" />
+        <input type="submit" value="Search"  id="ButtonClick"/>
+
+    <div id="divDestiny">(this is where the text will go)</div>
+
+
+</body>
+</html>

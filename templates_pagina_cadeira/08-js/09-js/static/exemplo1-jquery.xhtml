@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Title</title>
+    <style type="text/css">
+
+    </style>
+
+    <script src="jquery.js"></script>
+</head>
+<body>
+
+
+<script>
+     //<![CDATA[
+     $( document ).ready(function() {
+        $( "#form1" ).submit(function( event ) {
+            if ($("#term").val() == "") {
+                alert("The link will no longer take you to jquery.com");
+                event.preventDefault();
+            }
+        });
+        $( "#buttonFormat").click(function(event){
+            $("h1").css("background-color", "red")
+        });
+         $( "#buttonFormat").mouseout(function(event){
+            $("h1").css("background-color", "yellow")
+        });
+    });
+
+
+   //]]>
+</script>
+
+    <h1>Input a search term</h1>
+
+    <form method="post" action="process" id="form1">
+        <input id="term" type="text" name="term" size="20" />
+        <input id="buttonsubmit"  type="submit" value="Search" />
+    </form>
+<input type="button" id="buttonFormat"></input>
+
+ <h1>Other</h1>
+</body>
+</html>
