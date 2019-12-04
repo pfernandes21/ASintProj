@@ -50,16 +50,18 @@ def checkLogging():
         
 
 ##################HTML/API###############################
-@app.route('/API/<path:path>')
-def microservices_API(path):
+@app.route('/API/<microservice>/<path:path>')
+def microservices_API(microservice, path):
     
-    r = None
-
-    for microservices, URL in tableOfMicroservices.items():
-        try:
-            r = requests.get(URL + "/" + path)
-        except:
-            pass
+    try:
+        URL = tableOfMicroservices[microservice]
+        r = requests.get(URL + "/" + path)
+    except KeyError:
+        resp = jsonify("Not Found")
+        resp.status_code = 404
+    except:
+        resp = jsonify("Unsuccess")
+        resp.status_code = 400
     
     if(r is not None and r.status_code == 200):
         resp = jsonify(r.json())
