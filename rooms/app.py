@@ -31,6 +31,7 @@ def log():
     data['data'] = log
     r = requests.post(uri, json=data)
     print(r.text)
+    
 @app.route('/building/<int:buildingid>/rooms')
 def buildings(buildingid):
     if db.checkCache(buildingid):
@@ -99,7 +100,7 @@ def room_event_type(roomid, eventtype):
 
     return resp
 
-@app.route('/room/<int:roomid>/events/<date:eventdate>')
+@app.route('/room/<int:roomid>/events/<eventdate>')
 def room_event_date(roomid, eventdate):
     r = requests.get(URI + "/" + str(roomid))
     data = r.json()
@@ -121,7 +122,7 @@ def room_event_date(roomid, eventdate):
 
     return resp
 
-@app.route('/room/<int:roomid>/events/<eventtype>/<date:eventdate>')
+@app.route('/room/<int:roomid>/events/<eventtype>/<eventdate>')
 def room_event_type_date(roomid, eventtype, eventdate):
     r = requests.get(URI + "/" + str(roomid))
     data = r.json()

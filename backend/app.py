@@ -30,7 +30,6 @@ def configFileInit():
 
 tableOfMicroservices = configFileInit()
 
-
 @app.before_request
 def log():
     data = {}
@@ -52,8 +51,24 @@ def checkLogging():
 
 ##################HTML/API###############################
 @app.route('/API/<path:path>')
-def get_dir(path):
-    return path
+def microservices_API(path):
+    
+    r = None
+
+    for microservices, URL in tableOfMicroservices.items():
+        try:
+            r = requests.get(URL + "/" + path)
+        except:
+            pass
+    
+    if(r is not None and r.status_code == 200):
+        resp = jsonify(r.json())
+        resp.status_code = 200
+    else:
+        resp = jsonify("Unsuccess")
+        resp.status_code = 400 
+
+    return resp
 
 ##################ADMIN/LOG################################
 @app.route('/admin')
