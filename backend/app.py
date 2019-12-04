@@ -45,14 +45,58 @@ def log():
 def checkLogging():
     path_split = request.path.split('/')
     if path_split[1] == 'admin' and request.path != '/admin/login':
-        if not session.get('logged_in'):
+        if not session.get('admin_logged_in'):
             return render_template("login.html")
         
 
 ##################HTML/API###############################
+#FALTA FAZER PARA RECEBER POST PUT DELETE
 @app.route('/API/<microservice>/<path:path>')
 def microservices_API(microservice, path):
     
+    if microservice == 'configFile':
+        global tableOfMicroservices
+        if request.method == 'GET':
+            r = jsonify(tableOfMicroservices)
+            r.status_code = 200
+            return r
+        if request.method == 'PUT':
+            try:
+                tableOfMicroservices[request.json['key']] = request.json['url']
+                f = open('ConfigFile', 'wb')
+                pickle.dump(tableOfMicroservices, f)
+                f.close()
+                r = jsonify("SUCCESS")
+                r.status_code = 200
+            except:
+                r = jsonify("FAILED")
+                r.status_code = 400
+            return r
+        if request.method == 'POST':
+            try:
+                tableOfMicroservices[request.json['name']] = request.json['url']
+                f = open('ConfigFile', 'wb')
+                pickle.dump(tableOfMicroservices, f)
+                f.close()
+                r = jsonify("SUCCESS")
+                r.status_code = 200
+            except:
+                r = jsonify("FAILED")
+                r.status_code = 400
+            return r
+        if request.method == 'DELETE':
+            try:
+                del tableOfMicroservices[request.json['key']]
+                f = open('ConfigFile', 'wb')
+                pickle.dump(tableOfMicroservices, f)
+                f.close()
+                r = jsonify("SUCCESS")
+                r.status_code = 200
+            except:
+                r = jsonify("FAILED")
+                r.status_code = 400
+            return r
+
     try:
         URL = tableOfMicroservices[microservice]
         r = requests.get(URL + "/" + path)
@@ -73,6 +117,7 @@ def microservices_API(microservice, path):
     return resp
 
 ##################ADMIN/LOG################################
+API_url = 'http://127.0.0.1:5000'
 @app.route('/admin')
 def admin_main():
     return render_template('mainadmin.html')
@@ -80,14 +125,14 @@ def admin_main():
 @app.route('/admin/login', methods=['POST'])
 def do_admin_login():
     if request.form['password'] == 'admin' and request.form['username'] == 'admin':
-        session['logged_in'] = True
+        session['admin_logged_in'] = True
     else:
         flash('wrong password!')
     return redirect(url_for('admin_main'))
 
 @app.route("/admin/showLogs", methods=['POST','GET'])
 def showLogs():
-    uri = "%s/logs"%(tableOfMicroservices['Log'])
+    uri = "%s/API/logs"%(API_url)
     try:
         url = ("%s/%s")%(uri,str(request.form['numberOfLogs']))
     except:
@@ -110,8 +155,8 @@ def changeService():
     except:
         obj = None
 
-    url = "%s/services"%(tableOfMicroservices['Services'])
-    r = requests.get(url)
+    url = "%s/API/services"%(API_url)
+    r = requests.get(url)# MUDAR PARA FAZER REQUEST À API
     if r.status_code != 200:
         return redirect(url_for('admin_main'))
     return render_template("changeShowService.html", service = r.json(), obj = obj)
@@ -122,8 +167,8 @@ def changeServiceQuery(id):
 
 @app.route("/admin/deleteService/<id>")
 def deleteService(id):
-    url = "%s/service/%s"%(tableOfMicroservices['Services'],id)
-    r = requests.delete(url)
+    url = "%s/API/service/%s"%(API_url,id)
+    r = requests.delete(url)# MUDAR PARA FAZER REQUEST À API
 
     if r.status_code == 200:
         return redirect(url_for('changeService',message = "Success"))
@@ -154,8 +199,8 @@ def changeServicePost(id):
     except:
         return redirect(url_for('changeService',message = "Failed"))
 
-    url = "%s/service/%s"%(tableOfMicroservices['Services'],id)
-    r = requests.put(url,json=data)
+    url = "%s/API/service/%s"%(API_url,id)
+    r = requests.put(url,json=data)# MUDAR PARA FAZER REQUEST À API
 
     if r.status_code == 200:
         return redirect(url_for('changeService',message = "Success"))
@@ -169,7 +214,7 @@ def createService():
 @app.route("/admin/addService", methods=['POST'])
 def addService():
     data = {}
-    url = "%s/service"%(tableOfMicroservices['Services'])
+    url = "%s/API/service"%(API_url)
     allInfo = 0
     try:
         if request.form['location'] != '':
@@ -193,7 +238,7 @@ def addService():
     if allInfo != 4:
         return render_template("serviceQuery.html", obj = "Failed", change = False, ID = None)
     
-    r = requests.post(url, json=data)
+    r = requests.post(url, json=data) # MUDAR PARA FAZER REQUEST À API
     
     if r.status_code == 200:
         return render_template("serviceQuery.html", obj = "Success", change = False, ID = None)
@@ -208,51 +253,58 @@ def configFile():
     except:
         obj = None
 
-    return render_template("changeConfigFile.html", file = tableOfMicroservices, obj = obj)
+    url = "%s/API/configFile"%(API_url)
+
+    r = requests.get(url)
+
+    if r.status_code == 200:
+        return render_template("changeConfigFile.html", file = r.json(), obj = obj)
+    else:
+        return render_template(url_for('admin_main'))
 
 @app.route("/admin/changeMicroservice/<key>", methods=['POST'])
 def changeMicroservice(key):
     global tableOfMicroservices
     print("Change %s key %s"%(request.form['url'],key))
-    try:
-        if request.form['url'] != '':
-            tableOfMicroservices[key] = request.form['url']
-            f = open('ConfigFile', 'wb')
-            pickle.dump(tableOfMicroservices, f)
-            f.close()
-    except:
-        return redirect(url_for('configFile', message = "Failed"))
-
-    return redirect(url_for('configFile', message = "Success"))
+    if request.form['url'] != '':
+        url = "%s/API/configFile"%(API_url)
+        r = requests.put(url, json={url:"%s"%(request.form['url']),key:"%s"%(key)} )
+        if r.status_code == 200:
+            return redirect(url_for('configFile', message = "Success"))
+    return redirect(url_for('configFile', message = "Failed"))
 
 @app.route("/admin/deleteMicroservice/<key>")
 def deleteMicroservice(key):
-    global tableOfMicroservices
-    try:
-        del tableOfMicroservices[key]
-        f = open('ConfigFile', 'wb')
-        pickle.dump(tableOfMicroservices, f)
-        f.close()
-    except:
-        return redirect(url_for('configFile', message = "Failed"))
 
+    url = "%s/API/configFile"%(API_url)
+    r = requests.delete(url, json={key:"%s"%(key)} )
+    if r.status_code != 200:
+        return redirect(url_for('configFile', message = "Failed"))
     return redirect(url_for('configFile', message = "Success"))
 
 @app.route("/admin/addMicroservice", methods=['POST'])
 def addMicroservice():
-    global tableOfMicroservices
-    try:
-        if request.form['name'] != '' and request.form['url'] != '':
-            tableOfMicroservices[request.form['name']] = request.form['url']
-            f = open('ConfigFile', 'wb')
-            pickle.dump(tableOfMicroservices, f)
-            f.close()
-    except:
-        return redirect(url_for('configFile', message = "Failed"))
 
-    return redirect(url_for('configFile', message = "Success"))
+    if request.form['name'] != '' and request.form['url'] != '':
+        url = "%s/API/configFile"%(API_url)
+        r = requests.post(url, json={'name':"%s"%(request.form['name']),'url':"%s"%(request.form['url'])} )
+        if r.status_code == 200:
+            return redirect(url_for('configFile', message = "Success"))
+    return redirect(url_for('configFile', message = "Failed"))
 
+##################APLICAÇÃO MOBILE################################
 
+@app.route("/mobile/qrcode")
+def mobileQrCode():
+    return render_template("MobileQrCode.html")
+
+@app.route("/mobile/secret")
+def mobileUserValidation():
+    return render_template("MobileSecret.html")
+
+@app.route("/mobile/showroomservices")
+def mobileShowRoomServices():
+    return render_template("MobileShowRoomService.html")
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
