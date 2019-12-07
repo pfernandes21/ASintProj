@@ -25,7 +25,7 @@ class Log:
     
 def dictMicroservices():
     dicio = {}
-    dicio['canteens'] = "http://%s:%d"%(Canteen().host,Canteen().port)
+    dicio['canteen'] = "http://%s:%d"%(Canteen().host,Canteen().port)
     dicio['Log'] = "http://%s:%d"%(Log().host,Log().port)
     dicio['services'] = "http://%s:%d"%(Services().host,Services().port)
     dicio['rooms'] = "http://%s:%d"%(Rooms().host,Rooms().port)
