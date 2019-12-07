@@ -60,11 +60,19 @@ def htmlPages(NameService,path=None):
         url = 'http://127.0.0.1:5000/API/%s'%(NameService)
     else:
         path = path.split('=')
-        if path[0] == "%ss"%(NameService):
-            url = 'http://127.0.0.1:5000/API/%s/%s/%d'%(NameService,path[0],path[1])
-
-    print("Ola name service %s path %s"%(NameService,path))
-    return "Ola name service %s path %s"%(NameService,path)
+        if path[1] == 'today':
+            path[1] = date.today().strftime("%d%m%Y")
+        try:
+            url = 'http://127.0.0.1:5000/API/%s/%s/%s'%(NameService,path[0],path[1])
+        except:
+            url = None
+    
+    if url != None:
+        res = requests.get(url)
+        if res.status_code == 200:
+            return render_template("HTMLTemplate.html", obj=res.json(), url=url)
+    
+    return render_template("HTMLTemplate.html", obj={"name":NameService,"info":None}, url=url)
     
 #FALTA FAZER PARA RECEBER POST PUT DELETE
 @app.route('/API/<microservice>', methods=['GET','POST','PUT','DELETE'])
@@ -105,7 +113,10 @@ def microservices_API(microservice, path=None):
     try:
         URL = tableOfMicroservices[microservice]
         print(path)
-        r = requests.get(URL + "/" + path)
+        if path != None:
+            r = requests.get(URL + "/" + path)
+        else:
+            r = requests.get(URL + "/")
     except KeyError:
         resp = jsonify("Not Found")
         resp.status_code = 404
