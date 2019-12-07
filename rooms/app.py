@@ -167,11 +167,9 @@ def getRooms(building_data):
 
 def format_message(old):
     new = {}
+    new["name"] = "Rooms"
     new["info"] = {}
     for key in old:
-        if key.lower() == "name":
-            new[key] = old[key]
-            continue
         if key != "containedSpaces" and key != "topLevelSpace" and key != "parentSpace":
             new["info"][key] = old[key]
     return new
