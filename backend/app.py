@@ -77,19 +77,7 @@ def microservices_API(microservice, path=None):
             r = jsonify(tableOfMicroservices)
             r.status_code = 200
             return r
-        if request.method == 'PUT':
-            try:
-                tableOfMicroservices[request.json['key']] = request.json['url']
-                f = open('ConfigFile', 'wb')
-                pickle.dump(tableOfMicroservices, f)
-                f.close()
-                r = jsonify("SUCCESS")
-                r.status_code = 200
-            except:
-                r = jsonify("FAILED")
-                r.status_code = 400
-            return r
-        if request.method == 'POST':
+        elif request.method == 'PUT' or request.method == 'POST':
             try:
                 tableOfMicroservices[request.json['name']] = request.json['url']
                 f = open('ConfigFile', 'wb')
@@ -101,7 +89,7 @@ def microservices_API(microservice, path=None):
                 r = jsonify("FAILED")
                 r.status_code = 400
             return r
-        if request.method == 'DELETE':
+        elif request.method == 'DELETE':
             try:
                 del tableOfMicroservices[request.json['key']]
                 f = open('ConfigFile', 'wb')
@@ -285,7 +273,7 @@ def changeMicroservice(key):
     print("Change %s key %s"%(request.form['url'],key))
     if request.form['url'] != '':
         url = "%s/API/configFile"%(API_url)
-        r = requests.put(url, json={url:"%s"%(request.form['url']),key:"%s"%(key)} )
+        r = requests.put(url, json={'url':"%s"%(request.form['url']),"name":"%s"%(key)} )
         if r.status_code == 200:
             return redirect(url_for('configFile', message = "Success"))
     return redirect(url_for('configFile', message = "Failed"))
@@ -294,7 +282,7 @@ def changeMicroservice(key):
 def deleteMicroservice(key):
 
     url = "%s/API/configFile"%(API_url)
-    r = requests.delete(url, json={key:"%s"%(key)} )
+    r = requests.delete(url, json={"key":"%s"%(key)} )
     if r.status_code != 200:
         return redirect(url_for('configFile', message = "Failed"))
     return redirect(url_for('configFile', message = "Success"))
