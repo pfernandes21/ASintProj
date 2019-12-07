@@ -32,7 +32,7 @@ def log():
     
 
 
-@app.route('/menus')
+@app.route('/')
 def APIMenus():
     if db.checkCache(date.today().strftime("%d/%m/%Y")):
         resp = jsonify(db.showCache())
@@ -51,7 +51,7 @@ def APIMenus():
             resp.status_code = 400
     return resp
 
-@app.route('/menus/<type>')
+@app.route('/<type>')
 def APIMenusByType(type):
     if type.lower() == "almoco":
         type = "almoço"
@@ -66,7 +66,7 @@ def APIMenusByType(type):
         resp.status_code = 400
     return resp
 
-@app.route('/menus/dia/<int:menudate>')
+@app.route('/dia/<int:menudate>')
 def APIMenusByDay(menudate):
     date = format_date(menudate)
     uri = URI + "?day=%s"%(date)
@@ -81,7 +81,7 @@ def APIMenusByDay(menudate):
         resp.status_code = 400
     return resp
 
-@app.route('/menus/<type>/<int:menudate>')
+@app.route('/<type>/<int:menudate>')
 def APIMenusByTypeByDay(type,menudate):
     if type.lower() == "almoco":
         type = "almoço"
