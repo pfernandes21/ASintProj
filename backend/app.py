@@ -30,6 +30,8 @@ def configFileInit():
 
 tableOfMicroservices = configFileInit()
 
+API_url = 'http://127.0.0.1:5000'
+
 @app.before_request
 def log():
     data = {}
@@ -50,9 +52,24 @@ def checkLogging():
         
 
 ##################HTML/API###############################
+##########################As Páginas de HTML são do genero get<NOME DO SERVIÇO>/<Nome Do Serviço>=<ID>#############################
+@app.route('/get<NameService>')
+@app.route('/get<NameService>/<path:path>')
+def htmlPages(NameService,path=None):
+    if path == None:
+        url = 'http://127.0.0.1:5000/API/%s'%(NameService)
+    else:
+        path = path.split('=')
+        if path[0] == "%ss"%(NameService):
+            url = 'http://127.0.0.1:5000/API/%s/%s/%d'%(NameService,path[0],path[1])
+
+    print("Ola name service %s path %s"%(NameService,path))
+    return "Ola name service %s path %s"%(NameService,path)
+    
 #FALTA FAZER PARA RECEBER POST PUT DELETE
-@app.route('/API/<microservice>/<path:path>')
-def microservices_API(microservice, path):
+@app.route('/API/<microservice>', methods=['GET','POST','PUT','DELETE'])
+@app.route('/API/<microservice>/<path:path>', methods=['GET','POST','PUT','DELETE'])
+def microservices_API(microservice, path=None):
     
     if microservice == 'configFile':
         global tableOfMicroservices
@@ -96,9 +113,10 @@ def microservices_API(microservice, path):
                 r = jsonify("FAILED")
                 r.status_code = 400
             return r
-
+    r = None
     try:
         URL = tableOfMicroservices[microservice]
+        print(path)
         r = requests.get(URL + "/" + path)
     except KeyError:
         resp = jsonify("Not Found")
@@ -117,7 +135,6 @@ def microservices_API(microservice, path):
     return resp
 
 ##################ADMIN/LOG################################
-API_url = 'http://127.0.0.1:5000'
 @app.route('/admin')
 def admin_main():
     return render_template('mainadmin.html')
@@ -132,7 +149,7 @@ def do_admin_login():
 
 @app.route("/admin/showLogs", methods=['POST','GET'])
 def showLogs():
-    uri = "%s/API/logs"%(API_url)
+    uri = "%s/API/Log/logs"%(API_url)
     try:
         url = ("%s/%s")%(uri,str(request.form['numberOfLogs']))
     except:
@@ -155,7 +172,7 @@ def changeService():
     except:
         obj = None
 
-    url = "%s/API/services"%(API_url)
+    url = "%s/API/services/services"%(API_url)
     r = requests.get(url)# MUDAR PARA FAZER REQUEST À API
     if r.status_code != 200:
         return redirect(url_for('admin_main'))
@@ -167,7 +184,7 @@ def changeServiceQuery(id):
 
 @app.route("/admin/deleteService/<id>")
 def deleteService(id):
-    url = "%s/API/service/%s"%(API_url,id)
+    url = "%s/API/services/service/%s"%(API_url,id)
     r = requests.delete(url)# MUDAR PARA FAZER REQUEST À API
 
     if r.status_code == 200:
@@ -199,7 +216,7 @@ def changeServicePost(id):
     except:
         return redirect(url_for('changeService',message = "Failed"))
 
-    url = "%s/API/service/%s"%(API_url,id)
+    url = "%s/API/services/service/%s"%(API_url,id)
     r = requests.put(url,json=data)# MUDAR PARA FAZER REQUEST À API
 
     if r.status_code == 200:
@@ -214,7 +231,7 @@ def createService():
 @app.route("/admin/addService", methods=['POST'])
 def addService():
     data = {}
-    url = "%s/API/service"%(API_url)
+    url = "%s/API/services/service"%(API_url)
     allInfo = 0
     try:
         if request.form['location'] != '':
