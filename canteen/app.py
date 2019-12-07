@@ -51,7 +51,7 @@ def APIMenus():
             resp.status_code = 400
     return resp
 
-@app.route('/<type>')
+@app.route('/type/<type>')
 def APIMenusByType(type):
     if type.lower() == "almoco":
         type = "almoço"
@@ -66,7 +66,7 @@ def APIMenusByType(type):
         resp.status_code = 400
     return resp
 
-@app.route('/dia/<int:menudate>')
+@app.route('/day/<int:menudate>')
 def APIMenusByDay(menudate):
     date = format_date(menudate)
     uri = URI + "?day=%s"%(date)
