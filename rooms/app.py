@@ -32,7 +32,7 @@ def log():
     r = requests.post(uri, json=data)
     print(r.text)
     
-@app.route('/building/<int:buildingid>/rooms')
+@app.route('/building/<int:buildingid>')
 def buildings(buildingid):
     if db.checkCache(buildingid):
         resp = jsonify(db.showCache(buildingid))
