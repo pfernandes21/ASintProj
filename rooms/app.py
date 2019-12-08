@@ -45,12 +45,14 @@ def buildings(buildingid):
             resp = jsonify("Not Found")
             resp.status_code = 404
             return resp
-
+        list_rooms = {}
         rooms = getRooms(data)
+        list_rooms['name'] = 'Building %s'%(data['name'])
+        list_rooms['info'] = rooms
 
         try:
-            db.add(buildingid, rooms)
-            resp = jsonify(rooms)
+            db.add(buildingid, list_rooms)
+            resp = jsonify(list_rooms)
             resp.status_code = 200
         except Exception as e:
             print(e)
@@ -162,7 +164,7 @@ def getRooms(building_data):
             floor_data = r.json()
             for floor_rooms in floor_data['containedSpaces']:
                 if(floor_rooms['type'] == 'ROOM'):
-                    rooms.append(format_message(floor_rooms))
+                    rooms.append(format_message_v2(floor_rooms))
     return rooms
 
 def format_message(old):
@@ -172,6 +174,13 @@ def format_message(old):
     for key in old:
         if key != "containedSpaces" and key != "topLevelSpace" and key != "parentSpace":
             new["info"][key] = old[key]
+    return new
+
+def format_message_v2(old):
+    new = {}
+    for key in old:
+        if key != "containedSpaces" and key != "topLevelSpace" and key != "parentSpace" and key != 'type':
+            new[key] = old[key]
     return new
 
 if __name__ == '__main__':
