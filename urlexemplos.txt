@@ -1,4 +1,10 @@
 http://127.0.0.1:5000/getrooms/room=2448131363667    - SALA FA1
+http://127.0.0.1:5000/getrooms/room=2448131362971    - SALA EA1
+http://127.0.0.1:5000/getrooms/room=2448131362979    - SALA EA2
+http://127.0.0.1:5000/getrooms/room=2448131362251    - SALA C01
+
+http://127.0.0.1:5000/getrooms/building=2448131361091  - Torre Norte
+http://127.0.0.1:5000/getrooms/building=2448131361060  - Pavilhão Central
 
 http://127.0.0.1:5000/getcanteen                     - Ementa da semana 
 http://127.0.0.1:5000/getcanteen/day=today                     - Ementa do dia
