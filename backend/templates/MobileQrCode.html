@@ -3,9 +3,134 @@
     <head>
         <meta charset="UTF-8">
         <title>QrCode</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     </head>
     <body>
 
         <h1>QrCode</h1>
+
+        <style>
+            canvas {
+                display: none;
+            }
+            hr {
+                margin-top: 32px;
+            }
+            input[type="file"] {
+                display: block;
+                margin-bottom: 16px;
+            }
+            div {
+                margin-bottom: 16px;
+            }
+        </style>
+        <h1>Scan from WebCam:</h1>
+        <div>
+            <b>Device has camera: </b>
+            <span id="cam-has-camera"></span>
+            <br>
+            <span id="cam-scann">Scanning is close</span>
+            <br>
+            <video muted playsinline id="qr-video"></video>
+        </div>
+        <div>
+            <select id="inversion-mode-select">
+                <option value="original">Scan original (dark QR code on bright background)</option>
+                <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
+                <option value="both">Scan both</option>
+            </select>
+
+            <button id="Scan-button">Press to scan</button>
+            <br>
+        </div>
+        <b>Detected QR code: </b>
+        <span id="cam-qr-result">None</span>
+        <br>
+        <b>Last detected at: </b>
+        <span id="cam-qr-result-timestamp"></span>
+        <br>
+        <b>Detected API of QRcode</b>
+        <span id="api-cam-qr-result">None</span>
+        <hr>
+        
+        <div id="where-info-qrcode-will-be-put">
+
+        </div>
+        
+        <script type="module">
+            import QrScanner from "../static/qr-scanner.min.js";
+            QrScanner.WORKER_PATH = '../static/qr-scanner-worker.min.js';
+            const video = document.getElementById('qr-video');
+            const camHasCamera = document.getElementById('cam-has-camera');
+            const camScann = document.getElementById('cam-scann');
+            const camQrResult = document.getElementById('cam-qr-result');
+            const APIQrResult = document.getElementById('api-cam-qr-result');
+            const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
+            const ContentResult = document.getElementById('where-info-qrcode-will-be-put');
+            function setResult(label, result,API) {
+                var date = new Date();
+                label.textContent = result;
+                camQrResultTimestamp.textContent = date.toString();
+                label.style.color = 'teal';
+                clearTimeout(label.highlightTimeout);
+                label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+                var url = result.toString();
+                var path = url.substring(0,url.indexOf('get') + 'API/');
+                var url_split = url.split('/');
+                var nameService = url_split[3].substring(3);
+                var semi_path = url.substring(0,url.indexOf('get')) + 'API/'+nameService;
+                if(url_split[4] != undefined){
+                    var path = url_split[4].split('=');
+                    if(path[1] == 'today'){
+                        var dd = String(date.getDate()).padStart(2,'0');
+                        var mm = String(date.getMonth()+1).padStart(2,'0');
+                        var yyyy = date.getFullYear();
+                        path[1] = dd + mm + yyyy;
+                    }
+                    semi_path = semi_path +'/' + path[0]+'/'+path[1];
+                }
+                scanner.stop();
+                camScann.textContent = 'Scanning is close'
+                API.textContent = semi_path;
+                $.ajax({
+                    type: "get",
+                    url: semi_path,
+                    success: function (data) {
+                        console.log(data);
+                        var s = "<h2>" + data['name'] + "</h2>";
+                        var info = data['info']
+                        s += "<ol>";
+                        for (var key in info) {
+                            s += "<li>";
+                            var aux = info[key]
+                            if(typeof(info[key]) === "object")
+                            {
+                                console.log("IAKJHAJA");
+                                aux = JSON.stringify(aux);
+                            }
+                            s += key + ' : ' + aux;
+                            s += "</li>";
+                        }
+                        s += "</ol>";
+                        $("#where-info-qrcode-will-be-put").html(s);
+                        
+                    }
+                })
+            }
+            // ####### Web Cam Scanning #######
+            QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
+            const scanner = new QrScanner(video, result => setResult(camQrResult, result,APIQrResult,ContentResult));
+            // scanner.start();
+            document.getElementById('inversion-mode-select').addEventListener('change', event => {
+                scanner.setInversionMode(event.target.value);
+            });
+            // Press the button to scan
+            $("#Scan-button").click(function(){
+                scanner.start();
+                console.log('Scanner start')
+                camScann.textContent = 'Scanning is open'
+            });
+        </script>
+ 
     </body>
 </html>
