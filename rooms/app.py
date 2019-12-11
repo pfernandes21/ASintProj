@@ -71,6 +71,8 @@ def room(roomid):
         resp.status_code = 404
         return resp
 
+    get_events(data,None,None)
+        
     try:
         resp = jsonify(format_room(data))
         resp.status_code = 200
@@ -91,7 +93,7 @@ def room_event_type(roomid, eventtype):
         resp.status_code = 404
         return resp
 
-    data = get_events(data, eventtype, None)
+    get_events(data, eventtype, None)
 
     try:
         resp = jsonify(data)
@@ -113,7 +115,7 @@ def room_event_date(roomid, eventdate):
         resp.status_code = 404
         return resp
 
-    data = get_events(data, None, eventdate)
+    get_events(data, None, eventdate)
 
     try:
         resp = jsonify(data)
@@ -135,7 +137,7 @@ def room_event_type_date(roomid, eventtype, eventdate):
         resp.status_code = 404
         return resp
 
-    data = get_events(data, eventtype, eventdate)
+    get_events(data, eventtype, eventdate)
 
     try:
         resp = jsonify(data)
@@ -150,11 +152,12 @@ def room_event_type_date(roomid, eventtype, eventdate):
 def get_events(room, type, date):
     target_events = []
     events = room['events']
+
     for event in events:
-        if(event['type'] == type or event['day'] == date):
+        if(event['type'] == type or event['day'] == date or (type == None and date == None)):
             target_events.append(format_event(event))
     
-    return target_events
+    room['events'] = target_events
 
 
 def getRooms(building_data):
@@ -172,7 +175,18 @@ def getRooms(building_data):
 def format_event(event):
     del event['period']
     try:
-        event['course'] = events['course']['name']
+        name= ""
+        for course in event['courses']:
+            name = "%s "%(course['name'])
+        del event['courses']
+        event['courses'] = name
+    except:
+        pass
+
+    try:
+        name= event['course']['name']
+        del event['course']
+        event['course'] = name
     except:
         pass
 
@@ -183,7 +197,7 @@ def format_room(room):
     new["name"] = "Room"
     new["info"] = {}
     for key in room:
-        if key != "containedSpaces" and key != "topLevelSpace" and key != "parentSpace":
+        if key != "containedSpaces" and key != "topLevelSpace" and key != "parentSpace" and key != 'description' and key != 'id' and key!= 'type':
             new["info"][key] = room[key]
     return new
 
