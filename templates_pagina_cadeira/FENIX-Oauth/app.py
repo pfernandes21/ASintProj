@@ -5,14 +5,16 @@ from flask import request
 from flask import jsonify
 import requests
 
+from base64 import b64encode
+
 #to get the following value go to:
 # FENIX -> Pessoal - Gerir Aplicações -> criar
 #https://fenixedu.org/dev/tutorials/use-fenixedu-api-in-your-application/ (Step1)
 
-redirect_uri = "http://127.0.0.1:5000/userAuth" # this is the address of the page on this app
+redirect_uri = "http://127.0.0.1:10000/userAuth" # this is the address of the page on this app
 
-client_id= "12234455666935" # copy value from the app registration
-clientSecret = "6wrRVKcgjhjiHHKkjkGFD5LaoZioWPfg1SzNhwPoi*&&JhhhhoeXwSrdfqn7P3ed9ue+teTw==" # copy value from the app registration
+client_id= "1695915081465945" # copy value from the app registration
+clientSecret = "5IFRcpipd/TdvjxeXCh1g/8jO9vBhpXtOZiCeZ7PMA6r0iCntI8y85kYB08G+JIz99j9xKcBRgk1jNuk7YvbGQ==" # copy value from the app registration
 
 fenixLoginpage= "https://fenix.tecnico.ulisboa.pt/oauth/userdialog?client_id=%s&redirect_uri=%s"
 fenixacesstokenpage = 'https://fenix.tecnico.ulisboa.pt/oauth/access_token'
@@ -48,7 +50,7 @@ def private_page():
         if (resp.status_code == 200):
             r_info = resp.json()
             print( r_info)
-            return render_template("privPage.html", username=loginName, name=r_info['name'])
+            return render_template("privPage.html", username=loginName, name=r_info['name'],image=r_info['photo']['data'])
         else:
             return "oops"
 
@@ -84,7 +86,7 @@ def userAuthenticated():
         userToken = r_token['access_token']
 
         #now the user has done the login
-        return jsonify(r_info)
+        # return jsonify(r_info)
         #we show the returned infomration
         #but we could redirect the user to the private page
         return redirect('/private') #comment the return jsonify....
@@ -92,4 +94,4 @@ def userAuthenticated():
         return 'oops'
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=10000)
