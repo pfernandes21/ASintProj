@@ -5,8 +5,6 @@ from flask import request
 from flask import jsonify
 import requests
 
-from base64 import b64encode
-
 #to get the following value go to:
 # FENIX -> Pessoal - Gerir Aplicações -> criar
 #https://fenixedu.org/dev/tutorials/use-fenixedu-api-in-your-application/ (Step1)
