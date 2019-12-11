@@ -7,13 +7,14 @@ import json
 
 import canteenCache
 
-from datetime import date
+from datetime import date,datetime
 
 import sys
 sys.path.append(".")
 import config
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 db = canteenCache.Cache("")
 Log = config.Log()
 uri = "http://%s:%d/logs"%(Log.host,Log.port)
@@ -40,8 +41,9 @@ def APIMenus():
     else:
         r = requests.get(URI)
         data = r.json()
+        new = format_message(data,None,None)
+        new['info'] = orderTheData(new['info'])
         try:
-            new = format_message(data,None,None)
             db.add(new)
             resp = jsonify(new)
             resp.status_code = 200
@@ -97,6 +99,21 @@ def APIMenusByTypeByDay(type,menudate):
         resp = jsonify("Unsuccess")
         resp.status_code = 400
     return resp
+
+def orderTheData(data):
+    date = []
+    for key in data:
+        date.append(datetime.strptime(str(key),"%d/%m/%Y"))
+    print(date)
+    newData = {}
+    for key in sorted(date):
+        stringDate = datetime.strftime(key,"%d/%m/%Y")
+        if stringDate[0] == '0':
+            stringDate = stringDate[1:]
+        newData[stringDate] = data[stringDate]
+    print(newData)
+
+    return newData
 
 def format_message(old,tipo,date):
     new = {}
