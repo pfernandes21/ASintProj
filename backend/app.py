@@ -49,6 +49,11 @@ def checkLogging():
     if path_split[1] == 'admin' and request.path != '/admin/login':
         if not session.get('admin_logged_in'):
             return render_template("login.html")
+
+
+@app.route("/")
+def main():
+    return render_template("Main.html")
         
 
 ##################HTML/API###############################
@@ -309,7 +314,6 @@ def addMicroservice():
     return redirect(url_for('configFile', message = "Failed"))
 
 ##################APLICAÇÃO MOBILE################################
-
 @app.route("/mobile/qrcode")
 def mobileQrCode():
     return render_template("MobileQrCode.html")
@@ -320,7 +324,7 @@ def mobileUserValidation():
 
 @app.route("/mobile/showroomservices")
 def mobileShowRoomServices():
-    return render_template("MobileShowRoomService.html")
+    return render_template("MobileShowRoomService.html") 
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
