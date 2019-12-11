@@ -13,6 +13,7 @@ sys.path.append(".")
 import config
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
 def configFileInit():
     try:
@@ -116,8 +117,9 @@ def microservices_API(microservice, path=None):
             return r
     r = None
 
+    
     try:
-        URL = tableOfMicroservices[microservice] + '/' + path if path != None else ""
+        URL = tableOfMicroservices[microservice] + '/' + (path if path != None else "")
         if(request.method == 'GET'):
             r = requests.get(URL)
 
