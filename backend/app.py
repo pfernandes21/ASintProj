@@ -115,13 +115,22 @@ def microservices_API(microservice, path=None):
                 r.status_code = 400
             return r
     r = None
+
     try:
-        URL = tableOfMicroservices[microservice]
-        print(path)
-        if path != None:
-            r = requests.get(URL + "/" + path)
-        else:
-            r = requests.get(URL + "/")
+        URL = tableOfMicroservices[microservice] + '/' + path if path != None else ""
+        if(request.method == 'GET'):
+            r = requests.get(URL)
+
+        elif(request.method == 'POST'):
+            print(request.get_json())
+            r = requests.post(URL, json = request.get_json())
+
+        elif(request.method == 'PUT'):
+            r = requests.put(URL, json = request.get_json())
+
+        elif(request.method == 'DELETE'):
+            r = requests.delete(URL)
+
     except KeyError:
         resp = jsonify("Not Found")
         resp.status_code = 404

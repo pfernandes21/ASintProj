@@ -45,6 +45,7 @@ def buildings(buildingid):
             resp = jsonify("Not Found")
             resp.status_code = 404
             return resp
+
         list_rooms = {}
         rooms = getRooms(data)
         list_rooms['name'] = 'Building %s'%(data['name'])
@@ -71,7 +72,7 @@ def room(roomid):
         return resp
 
     try:
-        resp = jsonify(format_message(data))
+        resp = jsonify(format_room(data))
         resp.status_code = 200
     except Exception as e:
         print(e)
@@ -151,9 +152,10 @@ def get_events(room, type, date):
     events = room['events']
     for event in events:
         if(event['type'] == type or event['day'] == date):
-            target_events.append(format_message(event))
+            target_events.append(format_event(event))
     
     return target_events
+
 
 def getRooms(building_data):
     rooms = []
@@ -164,23 +166,32 @@ def getRooms(building_data):
             floor_data = r.json()
             for floor_rooms in floor_data['containedSpaces']:
                 if(floor_rooms['type'] == 'ROOM'):
-                    rooms.append(format_message_v2(floor_rooms))
+                    rooms.append(format_floor(floor_rooms))
     return rooms
 
-def format_message(old):
+def format_event(event):
+    del event['period']
+    try:
+        event['course'] = events['course']['name']
+    except:
+        pass
+
+    return event
+
+def format_room(room):
     new = {}
-    new["name"] = "Rooms"
+    new["name"] = "Room"
     new["info"] = {}
-    for key in old:
+    for key in room:
         if key != "containedSpaces" and key != "topLevelSpace" and key != "parentSpace":
-            new["info"][key] = old[key]
+            new["info"][key] = room[key]
     return new
 
-def format_message_v2(old):
+def format_floor(floor):
     new = {}
-    for key in old:
+    for key in floor:
         if key != "containedSpaces" and key != "topLevelSpace" and key != "parentSpace" and key != 'type':
-            new[key] = old[key]
+            new[key] = floor[key]
     return new
 
 if __name__ == '__main__':
