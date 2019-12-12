@@ -16,15 +16,14 @@ class Cache:
 		f = open('CanteenDB'+self.name, 'wb')
 		pickle.dump(self.db, f)
 		f.close()
-
-	def change(self):
-		pass
 		
 	def showCache(self):
 		return self.db
 
 	def checkCache(self,day):
-		
+		"""
+		Check if there is a menu of the argument day on the cache 
+		"""	
 		if self.db == {}:	
 			print("Não existe na Cache")
 			return False
@@ -35,3 +34,19 @@ class Cache:
 		except:
 			print("Não existe na Cache")
 			return False
+
+	def transform(self,day=None,type = None):
+		"""
+		Retrieve the information from the cache
+		"""
+		new = {}
+		new["name"] = "Canteen"
+		new["info"] = {}
+		for i in self.db["info"]:
+			if i == day or day == None:
+				new["info"][i] = {}
+				for j in self.db['info'][i]:
+					if j == type.capitalize() or type == None:
+						new["info"][i][j] = self.db["info"][i][j]
+
+		return new
