@@ -35,14 +35,25 @@ API_url = 'http://127.0.0.1:5000'
 
 @app.before_request
 def log():
+    """
+    Save the logs on the microservice Log
+    """
     data = {}
     log = {}
     uri = "%s/logs"%(tableOfMicroservices['Log'])
     log['dia'] = date.today().strftime("%d/%m/%Y")
     log['info'] = ('Server %s %s')%(request.method, request.url)
     data['data'] = log
-    r = requests.post(uri, json=data)
-    print("Register a log was a " + r.text)
+    try:
+        r = requests.post(uri, json=data)
+    except requests.exceptions.RequestException as e:
+        print(e)
+        print("\n\nThe microservice Log is unvailable. The Log is %s."%(log['info']))
+    else:
+        if r.status_code == 200:
+            print("Register Log was a success")
+        else:
+            print("Register Log was an unsuccess")
 
 @app.before_request
 def checkLogging():
@@ -342,4 +353,4 @@ if __name__ == '__main__':
     # app.run()
     # app.run(debug=True)
     cfg = config.Backend()
-    app.run(debug=True, host=cfg.host, port=cfg.port)
+    app.run(debug= True, host=cfg.host, port=cfg.port)

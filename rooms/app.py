@@ -24,13 +24,24 @@ uri = "http://%s:%d/logs"%(Log.host,Log.port)
 
 @app.before_request
 def log():
+    """
+    Save the logs on the microservice Log
+    """
     data = {}
     log = {}
     log['dia'] = date.today().strftime("%d/%m/%Y")
     log['info'] = ('Rooms %s %s')%(request.method, request.url)
     data['data'] = log
-    r = requests.post(uri, json=data)
-    print(r.text)
+    try:
+        r = requests.post(uri, json=data)
+    except requests.exceptions.RequestException as e:
+        print(e)
+        print("\n\nThe microservice Log is unvailable. The Log is %s."%(log['info']))
+    else:
+        if r.status_code == 200:
+            print("Register Log was a success")
+        else:
+            print("Register Log was an unsuccess")
     
 @app.route('/building/<int:buildingid>')
 def buildings(buildingid):

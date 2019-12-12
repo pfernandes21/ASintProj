@@ -23,13 +23,24 @@ URI = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen"
 
 @app.before_request
 def log():
+    """
+    Save the logs on the microservice Log
+    """
     data = {}
     log = {}
     log['dia'] = date.today().strftime("%d/%m/%Y")
     log['info'] = ('Canteen %s %s')%(request.method, request.url)
     data['data'] = log
-    r = requests.post(uri, json=data)
-    print(r.text)
+    try:
+        r = requests.post(uri, json=data)
+    except requests.exceptions.RequestException as e:
+        print(e)
+        print("\n\nThe microservice Log is unvailable. The Log is %s."%(log['info']))
+    else:
+        if r.status_code == 200:
+            print("Register Log was a success")
+        else:
+            print("Register Log was an unsuccess")
     
 
 
