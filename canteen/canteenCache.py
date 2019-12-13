@@ -35,7 +35,7 @@ class Cache:
 			print("Não existe na Cache")
 			return False
 
-	def transform(self,day=None,type = None):
+	def transform(self,day=None,tipo = None):
 		"""
 		Retrieve the information from the cache
 		"""
@@ -46,7 +46,7 @@ class Cache:
 			if i == day or day == None:
 				new["info"][i] = {}
 				for j in self.db['info'][i]:
-					if j == type.capitalize() or type == None:
+					if tipo == None or j == tipo.capitalize():
 						new["info"][i][j] = self.db["info"][i][j]
 
 		return new
