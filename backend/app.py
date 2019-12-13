@@ -1,7 +1,7 @@
 from flask import Flask, flash
 from flask import render_template
 from flask import request, session, abort, redirect, url_for
-from flask import jsonify
+from flask import jsonify, Markup
 import requests
 import os
 import pickle
@@ -66,6 +66,22 @@ def checkLogging():
 @app.route("/")
 def main():
     return render_template("Main.html")
+
+def jsonToHtml(resJson,h):
+    resHtml = ''
+    if type(resJson) is dict:
+        for key in resJson:
+            resHtml += '<h%d>'%(h) +'%s'%(key) + ' : '  + jsonToHtml(resJson[key],h+1) + '</h%d>'%(h)
+    elif type(resJson) is list:
+        resHtml += '<ul>'
+        for element in resJson:
+            resHtml += '<li>' + jsonToHtml(element,h) + '</li>'
+        resHtml += '</ul>'
+    elif type(resJson) is int or type(resJson) is float:
+        resHtml = str(resJson)
+    elif type(resJson) is str:
+        resHtml = resJson
+    return resHtml
         
 
 ##################HTML/API###############################
@@ -87,7 +103,12 @@ def htmlPages(NameService,path=None):
     if url != None:
         res = requests.get(url)
         if res.status_code == 200:
-            return render_template("HTMLTemplate.html", obj=res.json(), url=url)
+            data = res.json()
+            resHtml = jsonToHtml(data['info'],2)
+            value = Markup(resHtml)
+            return render_template("HTMLTemplate.html", html = value, obj=res.json(), url=url)
+            # return render_template("HTMLTemplate.html",obj=res.json(), url=url)
+
     
     return render_template("HTMLTemplate.html", obj={"name":NameService,"info":None}, url=url)
     
