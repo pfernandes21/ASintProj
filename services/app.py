@@ -2,7 +2,7 @@ from flask import Flask
 from flask import render_template
 from flask import request
 from flask import jsonify
-import DBService
+import DBSecretariat
 import sys
 sys.path.append(".")
 import config
@@ -10,7 +10,7 @@ import requests
 from datetime import date
 
 app = Flask(__name__)
-db = DBService.DBService("")
+db = DBSecretariat.DBSecretariat("")
 
 Log = config.Log()
 uri = "http://%s:%d/logs"%(Log.host,Log.port)
@@ -23,7 +23,7 @@ def log():
     data = {}
     log = {}
     log['dia'] = date.today().strftime("%d/%m/%Y")
-    log['info'] = ('Services %s %s')%(request.method, request.url)
+    log['info'] = ('Secretariats %s %s')%(request.method, request.url)
     data['data'] = log
     try:
         r = requests.post(uri, json=data)
@@ -36,36 +36,36 @@ def log():
         else:
             print("Register Log was an unsuccess")
 
-@app.route('/services')
-def APIListServices():
+@app.route('/secretariats')
+def APIListSecretariats():
     try:
-        services = db.listAllServices()
+        secretariats = db.listAllSecretariats()
     except:
         resp = jsonify("Unsuccess")
         resp.status_code = 404
         return resp
 
-    if services == None:
+    if secretariats == None:
         resp = jsonify("None")
     else:
-        resp = jsonify(services)
+        resp = jsonify(secretariats)
         
     resp.status_code = 200
     return resp
 
-@app.route('/service/<serviceid>')
-def APIShowService(serviceid):
+@app.route('/secretariat/<secretariatid>')
+def APIShowService(secretariatid):
     try:
-        service = db.showService(serviceid)
+        secretariat = db.showService(secretariatid)
     except:
         resp = jsonify("Not Found")
         resp.status_code = 400
         return resp
-    resp = jsonify(format_message(service.__dict__))
+    resp = jsonify(format_message(secretariat.__dict__))
     resp.status_code = 200
     return resp
 
-@app.route('/service', methods=['POST'])
+@app.route('/secretariat', methods=['POST'])
 def APICreateService():
     if request.is_json:
         try:
@@ -81,10 +81,10 @@ def APICreateService():
     resp.status_code = 400
     return resp
 
-@app.route('/service/<serviceid>', methods=['DELETE'])
-def APIDeleteService(serviceid):
+@app.route('/secretariat/<secretariatid>', methods=['DELETE'])
+def APIDeleteService(secretariatid):
     try:
-        db.rmService(serviceid)
+        db.rmService(secretariatid)
     except:
         resp = jsonify("Unsuccess")
         resp.status_code = 400
@@ -93,13 +93,13 @@ def APIDeleteService(serviceid):
     resp.status_code = 200
     return resp
 
-@app.route('/service/<serviceid>', methods=['PUT'])
-def APIChangeService(serviceid):
+@app.route('/secretariat/<secretariatid>', methods=['PUT'])
+def APIChangeService(secretariatid):
     if request.is_json:
         print(request.json)
         try:
             for i in range(len(request.json['key'])):
-                flag = db.changeService(serviceid,request.json['key'][i],request.json['value'][i])
+                flag = db.changeService(secretariatid,request.json['key'][i],request.json['value'][i])
                 if flag == "Wrong ID" or flag == "Wrong Json":
                     break
         except:
@@ -131,5 +131,5 @@ def format_message(old):
 
 if __name__ == '__main__':
     # app.run()
-    cfg = config.Services()
+    cfg = config.Secretariats()
     app.run(debug=True, host=cfg.host, port=cfg.port)
