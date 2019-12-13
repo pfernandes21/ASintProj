@@ -8,7 +8,7 @@ class Rooms:
        self.host = '127.0.0.1'
        self.port = 6000
 
-class Services:
+class Secretariats:
    def  __init__(self):
        self.host = '127.0.0.1'
        self.port = 7000
@@ -27,6 +27,6 @@ def dictMicroservices():
     dicio = {}
     dicio['canteen'] = "http://%s:%d"%(Canteen().host,Canteen().port)
     dicio['Log'] = "http://%s:%d"%(Log().host,Log().port)
-    dicio['services'] = "http://%s:%d"%(Services().host,Services().port)
+    dicio['secretariats'] = "http://%s:%d"%(Secretariats().host,Secretariats().port)
     dicio['rooms'] = "http://%s:%d"%(Rooms().host,Rooms().port)
     return dicio
