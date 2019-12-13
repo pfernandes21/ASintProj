@@ -17,6 +17,9 @@ app = Flask(__name__)
 
 
 class Logs:
+    """
+    Class that saves the logs of the server of the Project
+    """
     def __init__(self, name):
         self.name = name
         try:
@@ -40,11 +43,16 @@ class Logs:
         self.count += 1
 
     def showLogs(self):
+        """
+        Return all the logs
+        """
         return  self.db
 
     def showNLogs(self,N):
+        """
+        Return the last N logs
+        """
         log = {}
-        print(N)
         if self.count > 0:
             if N > self.count:
                 return self.db
@@ -65,6 +73,9 @@ db = Logs("")
 
 @app.route('/logs')
 def showLogs():
+    """
+    Return all the logs that are saved
+    """
     try:
         logs = db.showLogs()
         resp = jsonify(logs)
@@ -77,6 +88,9 @@ def showLogs():
 
 @app.route('/logs/<int:number>')
 def showNLogs(number):
+    """
+    Return the last N logs that were save
+    """
     try:
         logs = db.showNLogs(number)
         if logs == []:
@@ -91,6 +105,9 @@ def showNLogs(number):
     
 @app.route('/logs',methods=['POST','PUT'])
 def AddLog():
+    """
+    Save a Log that came from a outside request
+    """
     if request.is_json:
         db.add(request.json['data'])
         resp = jsonify("Success")
