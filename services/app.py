@@ -54,9 +54,9 @@ def APIListSecretariats():
     return resp
 
 @app.route('/secretariat/<secretariatid>')
-def APIShowService(secretariatid):
+def APIShowSecretariat(secretariatid):
     try:
-        secretariat = db.showService(secretariatid)
+        secretariat = db.showSecretariat(secretariatid)
     except:
         resp = jsonify("Not Found")
         resp.status_code = 400
@@ -66,10 +66,10 @@ def APIShowService(secretariatid):
     return resp
 
 @app.route('/secretariat', methods=['POST'])
-def APICreateService():
+def APICreateSecretariat():
     if request.is_json:
         try:
-            db.addService(request.json['location'],request.json['name'],request.json['description'],request.json['openTime'])
+            db.addSecretariat(request.json['location'],request.json['name'],request.json['description'],request.json['openTime'])
         except:
             resp = jsonify("Unsuccess")
             resp.status_code = 400
@@ -82,9 +82,9 @@ def APICreateService():
     return resp
 
 @app.route('/secretariat/<secretariatid>', methods=['DELETE'])
-def APIDeleteService(secretariatid):
+def APIDeleteSecretariat(secretariatid):
     try:
-        db.rmService(secretariatid)
+        db.rmSecretariat(secretariatid)
     except:
         resp = jsonify("Unsuccess")
         resp.status_code = 400
@@ -94,12 +94,12 @@ def APIDeleteService(secretariatid):
     return resp
 
 @app.route('/secretariat/<secretariatid>', methods=['PUT'])
-def APIChangeService(secretariatid):
+def APIChangeSecretariat(secretariatid):
     if request.is_json:
         print(request.json)
         try:
             for i in range(len(request.json['key'])):
-                flag = db.changeService(secretariatid,request.json['key'][i],request.json['value'][i])
+                flag = db.changeSecretariat(secretariatid,request.json['key'][i],request.json['value'][i])
                 if flag == "Wrong ID" or flag == "Wrong Json":
                     break
         except:
