@@ -67,21 +67,21 @@ def APIMenus():
             resp.status_code = 400
     return resp
 
-@app.route('/type/<type>')
-def APIMenusByType(type):
+@app.route('/type/<tipo>')
+def APIMenusByType(tipo):
     """
     Return all one menu of a day during a week (dinner or lunch)
     """
-    if type.lower() == "almoco":
-        type = "almoço"
+    if tipo.lower() == "almoco":
+        tipo = "almoço"
     if db.checkCache(date):
-        resp = jsonify(db.transform(None,type))
+        resp = jsonify(db.transform(None,tipo))
         resp.status_code = 200
     else:
         r = requests.get(URI)
         data = r.json()
         try:
-            resp = jsonify(format_message(data,type,None))
+            resp = jsonify(format_message(data,tipo,None))
             resp.status_code = 200
         except Exception as e:
             print(e)
@@ -112,23 +112,23 @@ def APIMenusByDay(menudate):
             resp.status_code = 400
     return resp
 
-@app.route('/<type>/<int:menudate>')
-def APIMenusByTypeByDay(type,menudate):
+@app.route('/<tipo>/<int:menudate>')
+def APIMenusByTypeByDay(tipo,menudate):
     """
     Return one menu of a day ( lunch or dinner )
     """
-    if type.lower() == "almoco":
-        type = "almoço"
+    if tipo.lower() == "almoco":
+        tipo = "almoço"
     date = format_date(menudate)
     if db.checkCache(date):
-        resp = jsonify(db.transform(date,type))
+        resp = jsonify(db.transform(date,tipo))
         resp.status_code = 200
     else:
         uri = URI + "?day=%s"%(date)
         r = requests.get(uri)
         data = r.json()
         try:
-            resp = jsonify(format_message(data,type,date))
+            resp = jsonify(format_message(data,tipo,date))
             resp.status_code = 200
         except Exception as e:
             print(e)
