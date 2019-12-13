@@ -10,5 +10,5 @@ http://127.0.0.1:5000/getcanteen                     - Ementa da semana
 http://127.0.0.1:5000/getcanteen/day=today                     - Ementa do dia
 
 
-http://127.0.0.1:5000/getservices/service=d483f8d0-1920-11ea-ad60-1cb72c295802
-http://127.0.0.1:5000/getservices/service=de4d39d0-1920-11ea-a5f9-1cb72c295802
+http://127.0.0.1:5000/getsecretariats/secretariat=001e6454-1da3-11ea-b79b-1cb72c295802
+http://127.0.0.1:5000/getsecretariats/secretariat=52d47562-1da1-11ea-a12e-1cb72c295802

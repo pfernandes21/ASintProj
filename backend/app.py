@@ -211,36 +211,36 @@ def showLogs():
 def queryLogs():
     return render_template("logsQuery.html")
 
-@app.route("/admin/changeService")
-def changeService():
+@app.route("/admin/changeSecretariat")
+def changeSecretariat():
     try:
         obj = request.args['message']
         print(obj)
     except:
         obj = None
 
-    url = "%s/API/services/services"%(API_url)
+    url = "%s/API/secretariats/secretariats"%(API_url)
     r = requests.get(url)# MUDAR PARA FAZER REQUEST À API
     if r.status_code != 200:
         return redirect(url_for('admin_main'))
-    return render_template("changeShowService.html", service = r.json(), obj = obj)
+    return render_template("changeShowSecretariat.html", secretariat = r.json(), obj = obj)
 
-@app.route("/admin/changeService/<id>")
-def changeServiceQuery(id):
-    return render_template("serviceQuery.html", ID = id, change = True, obj = None)
+@app.route("/admin/changeSecretariat/<id>")
+def changeSecretariatQuery(id):
+    return render_template("secretariatQuery.html", ID = id, change = True, obj = None)
 
-@app.route("/admin/deleteService/<id>")
-def deleteService(id):
-    url = "%s/API/services/service/%s"%(API_url,id)
+@app.route("/admin/deleteSecretariat/<id>")
+def deleteSecretariat(id):
+    url = "%s/API/secretariats/secretariat/%s"%(API_url,id)
     r = requests.delete(url)# MUDAR PARA FAZER REQUEST À API
 
     if r.status_code == 200:
-        return redirect(url_for('changeService',message = "Success"))
+        return redirect(url_for('changeSecretariat',message = "Success"))
     else:
-        return redirect(url_for('changeService',message = "Failed"))
+        return redirect(url_for('changeSecretariat',message = "Failed"))
 
-@app.route("/admin/changeService/<id>", methods=['POST'])
-def changeServicePost(id):
+@app.route("/admin/changeSecretariat/<id>", methods=['POST'])
+def changeSecretariatPost(id):
     data = {}
     data['key'] = []
     data['value'] = []
@@ -261,24 +261,24 @@ def changeServicePost(id):
             data['key'].append('openTime')
             data['value'].append(request.form['openTime'])
     except:
-        return redirect(url_for('changeService',message = "Failed"))
+        return redirect(url_for('changeSecretariat',message = "Failed"))
 
-    url = "%s/API/services/service/%s"%(API_url,id)
+    url = "%s/API/secretariats/secretariat/%s"%(API_url,id)
     r = requests.put(url,json=data)# MUDAR PARA FAZER REQUEST À API
 
     if r.status_code == 200:
-        return redirect(url_for('changeService',message = "Success"))
+        return redirect(url_for('changeSecretariat',message = "Success"))
     else:
-        return redirect(url_for('changeService',message = "Failed"))
+        return redirect(url_for('changeSecretariat',message = "Failed"))
 
-@app.route("/admin/createService")
-def createService():
-    return render_template("serviceQuery.html", change=False)
+@app.route("/admin/createSecretariat")
+def createSecretariat():
+    return render_template("secretariatQuery.html", change=False)
 
-@app.route("/admin/addService", methods=['POST'])
-def addService():
+@app.route("/admin/addSecretariat", methods=['POST'])
+def addSecretariat():
     data = {}
-    url = "%s/API/services/service"%(API_url)
+    url = "%s/API/secretariats/secretariat"%(API_url)
     allInfo = 0
     try:
         if request.form['location'] != '':
@@ -297,17 +297,17 @@ def addService():
             allInfo += 1
             data['openTime'] = request.form['openTime']
     except:
-        return render_template("serviceQuery.html", obj = "Failed", change = False, ID = None)
+        return render_template("secretariatQuery.html", obj = "Failed", change = False, ID = None)
     
     if allInfo != 4:
-        return render_template("serviceQuery.html", obj = "Failed", change = False, ID = None)
+        return render_template("secretariatQuery.html", obj = "Failed", change = False, ID = None)
     
     r = requests.post(url, json=data) # MUDAR PARA FAZER REQUEST À API
     
     if r.status_code == 200:
-        return render_template("serviceQuery.html", obj = "Success", change = False, ID = None)
+        return render_template("secretariatQuery.html", obj = "Success", change = False, ID = None)
     else:
-        return render_template("serviceQuery.html", obj = "Failed", change = False, ID = None)
+        return render_template("secretariatQuery.html", obj = "Failed", change = False, ID = None)
 
 @app.route("/admin/configFile")
 def configFile():
@@ -365,9 +365,9 @@ def mobileQrCode():
 def mobileUserValidation():
     return render_template("MobileSecret.html")
 
-@app.route("/mobile/showroomservices")
-def mobileShowRoomServices():
-    return render_template("MobileShowRoomService.html") 
+@app.route("/mobile/showroomsecretariats")
+def mobileShowRoomSecretariats():
+    return render_template("MobileShowRoomSecretariat.html") 
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
