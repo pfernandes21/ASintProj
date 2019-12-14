@@ -57,6 +57,9 @@ def log():
 
 @app.before_request
 def checkLogging():
+    """
+    Check if the admin pages are logged
+    """
     path_split = request.path.split('/')
     if path_split[1] == 'admin' and request.path != '/admin/login':
         if not session.get('admin_logged_in'):
@@ -68,6 +71,11 @@ def main():
     return render_template("Main.html")
 
 def jsonToHtml(resJson,h):
+    """
+    Arguments: JSON and the number for the Markup 'h' \n
+    Return: String that contains the HTML \n
+    Summary: Convert JSON to HTML
+    """
     resHtml = ''
     if type(resJson) is dict:
         for key in resJson:
@@ -89,6 +97,9 @@ def jsonToHtml(resJson,h):
 @app.route('/get<NameService>')
 @app.route('/get<NameService>/<path:path>')
 def htmlPages(NameService,path=None):
+    """
+    Generate the html page after requesting information according with the route to the API of the server
+    """
     if path == None:
         url = 'http://127.0.0.1:5000/API/%s'%(NameService)
     else:
@@ -107,8 +118,6 @@ def htmlPages(NameService,path=None):
             resHtml = jsonToHtml(data['info'],2)
             value = Markup(resHtml)
             return render_template("HTMLTemplate.html", html = value, obj=res.json(), url=url)
-            # return render_template("HTMLTemplate.html",obj=res.json(), url=url)
-
     
     return render_template("HTMLTemplate.html", obj={"name":NameService,"info":None}, url=url)
     
@@ -116,7 +125,12 @@ def htmlPages(NameService,path=None):
 @app.route('/API/<microservice>', methods=['GET','POST','PUT','DELETE'])
 @app.route('/API/<microservice>/<path:path>', methods=['GET','POST','PUT','DELETE'])
 def microservices_API(microservice, path=None):
-    
+    """
+    API of the Server.\n
+    It is also a proxy where it forward correctly to the url of the microservice according with the route.
+    """
+
+    #Change create or delete entries of the Table that is used to forward to the correct url of the microservice
     if microservice == 'configFile':
         global tableOfMicroservices
         if request.method == 'GET':
@@ -149,7 +163,7 @@ def microservices_API(microservice, path=None):
             return r
     r = None
 
-    
+    # Forward the request to the respective url of the microservice
     try:
         URL = tableOfMicroservices[microservice] + '/' + (path if path != None else "")
         if(request.method == 'GET'):
@@ -209,10 +223,17 @@ def showLogs():
 
 @app.route("/admin/queryLogs")
 def queryLogs():
+    """
+    Ask the admin user if he wants to see all the logs or how many logs he wants to see.
+    """
     return render_template("logsQuery.html")
 
 @app.route("/admin/changeSecretariat")
 def changeSecretariat():
+    """
+    Request the API to show all the secretariats that are possible to change.\n
+    And shows to the user.
+    """
     try:
         obj = request.args['message']
         print(obj)
@@ -220,7 +241,7 @@ def changeSecretariat():
         obj = None
 
     url = "%s/API/secretariats/secretariats"%(API_url)
-    r = requests.get(url)# MUDAR PARA FAZER REQUEST À API
+    r = requests.get(url)
     if r.status_code != 200:
         return redirect(url_for('admin_main'))
     return render_template("changeShowSecretariat.html", secretariat = r.json(), obj = obj)
@@ -231,8 +252,11 @@ def changeSecretariatQuery(id):
 
 @app.route("/admin/deleteSecretariat/<id>")
 def deleteSecretariat(id):
+    """
+    Request the API to delete a specific secretariat
+    """
     url = "%s/API/secretariats/secretariat/%s"%(API_url,id)
-    r = requests.delete(url)# MUDAR PARA FAZER REQUEST À API
+    r = requests.delete(url)
 
     if r.status_code == 200:
         return redirect(url_for('changeSecretariat',message = "Success"))
@@ -241,6 +265,9 @@ def deleteSecretariat(id):
 
 @app.route("/admin/changeSecretariat/<id>", methods=['POST'])
 def changeSecretariatPost(id):
+    """
+    Retrieve from the form the fields that the user wants to change on the secretariat and pass the information to the API.
+    """
     data = {}
     data['key'] = []
     data['value'] = []
@@ -277,6 +304,9 @@ def createSecretariat():
 
 @app.route("/admin/addSecretariat", methods=['POST'])
 def addSecretariat():
+    """
+    Retrieve from the form all the information to create a new secretariat and pass the information to the API.
+    """
     data = {}
     url = "%s/API/secretariats/secretariat"%(API_url)
     allInfo = 0
@@ -311,6 +341,9 @@ def addSecretariat():
 
 @app.route("/admin/configFile")
 def configFile():
+    """
+    Request to the API all the information about the forwarding table and present this information to the admin user.
+    """
     try:
         obj = request.args['message']
         print(obj)
@@ -328,8 +361,9 @@ def configFile():
 
 @app.route("/admin/changeMicroservice/<key>", methods=['POST'])
 def changeMicroservice(key):
-    global tableOfMicroservices
-    print("Change %s key %s"%(request.form['url'],key))
+    """
+    Retrieve the new url from the form to change a specific entry of the forwarding table and pass this information to the API:
+    """
     if request.form['url'] != '':
         url = "%s/API/configFile"%(API_url)
         r = requests.put(url, json={'url':"%s"%(request.form['url']),"name":"%s"%(key)} )
@@ -339,7 +373,9 @@ def changeMicroservice(key):
 
 @app.route("/admin/deleteMicroservice/<key>")
 def deleteMicroservice(key):
-
+    """
+    Request the API to delete a specific entry of the forwarding table.
+    """
     url = "%s/API/configFile"%(API_url)
     r = requests.delete(url, json={"key":"%s"%(key)} )
     if r.status_code != 200:
@@ -348,7 +384,9 @@ def deleteMicroservice(key):
 
 @app.route("/admin/addMicroservice", methods=['POST'])
 def addMicroservice():
-
+    """
+    Retrieve from the form all the information to create a new entry on the forwarding table and pass this information to the API.
+    """
     if request.form['name'] != '' and request.form['url'] != '':
         url = "%s/API/configFile"%(API_url)
         r = requests.post(url, json={'name':"%s"%(request.form['name']),'url':"%s"%(request.form['url'])} )
