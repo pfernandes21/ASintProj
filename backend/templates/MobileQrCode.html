@@ -68,6 +68,34 @@
             const APIQrResult = document.getElementById('api-cam-qr-result');
             const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
             const ContentResult = document.getElementById('where-info-qrcode-will-be-put');
+            function jsonToHtml(resJson,h){
+                var resHtml = '';
+                var key,element,array = false;
+                if (typeof(resJson) === "object"){
+                    for (key in resJson)
+                    {
+                        element = Number(key)
+                        console.log("new Iteration")
+                        console.log(typeof(key))
+                        console.log(key)
+                        console.log(element)
+                        if( element.toString() !== 'NaN')
+                        {    
+                            resHtml += '<ul>'
+                            resHtml += '<li><h'+h.toString() +'>' + jsonToHtml(resJson[key],h+1) + '</h' + h.toString() + '></li>'
+                            resHtml += '</ul>'
+                        }
+                        else{
+                            resHtml += '<h'+h.toString() +'>' + key.toString() + ' : '  + jsonToHtml(resJson[key],h+1) + '</h' + h.toString() + '>'
+                        }
+                    }
+                }
+                else if (typeof(resJson) === "number")
+                    resHtml = resJson.toString()
+                else if (typeof(resJson) === "string")
+                    resHtml = resJson
+                return resHtml
+            }
             function setResult(label, result,API) {
                 var date = new Date();
                 label.textContent = result;
@@ -100,23 +128,10 @@
                         console.log(data);
                         var s = "<h2>" + data['name'] + "</h2>";
                         var info = data['info']
-                        s += "<ol>";
-                        for (var key in info) {
-                            s += "<li>";
-                            var aux = info[key]
-                            if(typeof(info[key]) === "object")
-                            {
-                                console.log("IAKJHAJA");
-                                aux = JSON.stringify(aux);
-                            }
-                            s += key + ' : ' + aux;
-                            s += "</li>";
-                        }
-                        s += "</ol>";
+                        s += jsonToHtml(info,4)
                         $("#where-info-qrcode-will-be-put").html(s);
-                        
                     }
-                })
+                });
             }
             // ####### Web Cam Scanning #######
             QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
