@@ -96,6 +96,9 @@
                     resHtml = resJson
                 return resHtml
             }
+
+            // From the Scanner retrieve tha URL and send REST to the API.
+            // After receive the information present to the user
             function setResult(label, result,API) {
                 var date = new Date();
                 label.textContent = result;
@@ -133,6 +136,7 @@
                     }
                 });
             }
+            
             // ####### Web Cam Scanning #######
             QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
             const scanner = new QrScanner(video, result => setResult(camQrResult, result,APIQrResult,ContentResult));
