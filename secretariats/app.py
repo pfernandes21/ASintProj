@@ -10,6 +10,7 @@ import requests
 from datetime import date
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 db = DBSecretariat.DBSecretariat("")
 
 Log = config.Log()

@@ -6,8 +6,8 @@ class Secretariat:
     Class that represent one Secretariat
     """
     def __init__(self,Location,Name,Description,OpenTime):
-        self.Location = Location
         self.Name = Name
+        self.Location = Location
         self.Description = Description
         self.OpenTime = OpenTime
         self.id = str(uuid.uuid1())
