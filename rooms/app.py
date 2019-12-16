@@ -10,8 +10,6 @@ import sys
 sys.path.append(".")
 import config
 
-import requests
-
 from datetime import date
 
 app = Flask(__name__)
