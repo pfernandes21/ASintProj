@@ -5,8 +5,10 @@ from flask import jsonify, Markup
 import requests
 import os
 import pickle
-from json2html import *
+from json2html import json2html
 from datetime import date
+import random
+import string
 
 import sys
 sys.path.append(".")
@@ -14,6 +16,16 @@ import config
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+
+redirect_uri = "http://127.0.0.1:5000/mobile/userAuth"
+client_id= "570015174623377"
+clientSecret = "mtYM5CsjJFREl27myQqsnXnyuBv7zjxb3PVkc2WJ/7VaVv9y+JbqRJSKxIWYBsGcApgBHdjayOKNmHUlqbcp8A=="
+fenixLoginpage= "https://fenix.tecnico.ulisboa.pt/oauth/userdialog?client_id=%s&redirect_uri=%s"
+fenixacesstokenpage = 'https://fenix.tecnico.ulisboa.pt/oauth/access_token'
+
+API_url = 'http://127.0.0.1:5000'
+
+secrets = {}
 
 def configFileInit():
     try:
@@ -31,7 +43,10 @@ def configFileInit():
 
 tableOfMicroservices = configFileInit()
 
-API_url = 'http://127.0.0.1:5000'
+def randomString(stringLength = 6):
+    """Generate a random string of fixed length """
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choice(chars) for i in range(stringLength))
 
 @app.before_request
 def log():
@@ -122,7 +137,6 @@ def htmlPages(NameService,path=None):
     
     return render_template("HTMLTemplate.html", obj={"name":NameService,"info":None}, url=url)
     
-#FALTA FAZER PARA RECEBER POST PUT DELETE
 @app.route('/API/<microservice>', methods=['GET','POST','PUT','DELETE'])
 @app.route('/API/<microservice>/<path:path>', methods=['GET','POST','PUT','DELETE'])
 def microservices_API(microservice, path=None):
@@ -400,13 +414,111 @@ def addMicroservice():
 def mobileQrCode():
     return render_template("MobileQrCode.html")
 
-@app.route("/mobile/secret")
-def mobileUserValidation():
-    return render_template("MobileSecret.html")
-
 @app.route("/mobile/showroomsecretariats")
 def mobileShowRoomSecretariats():
     return render_template("MobileShowRoomSecretariat.html") 
+
+@app.route('/mobile/secret')
+def private_page():
+    #this page can only be accessed by a authenticated username
+
+    if not session.get('loginName'):
+        #if the user is not authenticated
+
+        redPage = fenixLoginpage % (client_id, redirect_uri)
+        # the app redirecte the user to the FENIX login page
+        return redirect(redPage)
+    else:
+        params = {'access_token': session.get('userToken')}
+        resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
+
+        if (resp.status_code == 200):
+            r_info = resp.json()
+
+            global secrets
+            secret = randomString()
+           
+            secrets[secret] = [{'username':session.get('loginName'), 'name': r_info['name'], 'photo': r_info['photo']['data']}, False, None,False]
+            
+            return render_template("MobileSecret.html", secret = secret)
+        else:
+            return "oops"
+
+@app.route('/mobile/userAuth')
+def userAuthenticated():
+    #This page is accessed when the user is authenticated by the fenix login pagesetup
+
+    #first we get the secret code retuner by the FENIX login
+    code = request.args['code']
+    print ("code " + request.args['code'])
+
+    # we now retrieve a fenix access token
+    payload = {'client_id': client_id, 'client_secret': clientSecret, 'redirect_uri' : redirect_uri, 'code' : code, 'grant_type': 'authorization_code'}
+    response = requests.post(fenixacesstokenpage, params = payload)
+    print (response.url)
+    print (response.status_code)
+    if(response.status_code == 200):
+        #if we receive the token
+        print ('getting user info')
+        r_token = response.json()
+        print(r_token)
+
+        params = {'access_token': r_token['access_token']}
+        resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
+        r_info = resp.json()
+        print( r_info)
+
+        # we store it
+        session['loginName'] = r_info['username']
+        session['userToken'] = r_token['access_token']
+
+        #now the user has done the login
+        # return jsonify(r_info)
+        #we show the returned infomration
+        #but we could redirect the user to the private page
+        return redirect('/mobile/secret') #comment the return jsonify....
+    else:
+        return 'oops'
+
+@app.route('/mobile/who', methods = ['POST', 'GET'])
+def who():
+    if not session.get('loginName'):
+        #if the user is not authenticated
+
+        redPage = fenixLoginpage % (client_id, redirect_uri)
+        # the app redirecte the user to the FENIX login page
+        return redirect(redPage)
+    else:
+        global secrets
+        if request.method == 'GET':
+            secret = request.args['secret']
+            while not secrets[secret][1]:
+                pass
+
+            secret2 = randomString()
+           
+            secrets[secret2] = [secrets[secret][0], False, None] 
+            resp = jsonify({'secret':secret2,'dataUser':secrets[secret][2]})
+            del secrets[secret]
+
+            return resp
+        elif request.method == 'POST':
+            
+            params = {'access_token': session.get('userToken')}
+            resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
+
+            if (resp.status_code == 200):
+                r_info = resp.json()
+
+                secret = request.form['secret']
+
+                secrets[secret][2] = {'username':session.get('loginName'), 'name': r_info['name'], 'photo': r_info['photo']['data']}
+                resp =  jsonify(secrets[secret][0])
+                secrets[secret][1] = True
+                return resp
+            else:
+                return jsonify({'username': session.get('loginName'), 'name': None, 'photo': None})
+
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
