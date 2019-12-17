@@ -9,10 +9,10 @@ import requests
 # FENIX -> Pessoal - Gerir Aplicações -> criar
 #https://fenixedu.org/dev/tutorials/use-fenixedu-api-in-your-application/ (Step1)
 
-redirect_uri = "http://127.0.0.1:10000/userAuth" # this is the address of the page on this app
+redirect_uri = "http://127.0.0.1:5000/userAuth" # this is the address of the page on this app
 
-client_id= "1695915081465945" # copy value from the app registration
-clientSecret = "5IFRcpipd/TdvjxeXCh1g/8jO9vBhpXtOZiCeZ7PMA6r0iCntI8y85kYB08G+JIz99j9xKcBRgk1jNuk7YvbGQ==" # copy value from the app registration
+client_id= "570015174623377" # copy value from the app registration
+clientSecret = "mtYM5CsjJFREl27myQqsnXnyuBv7zjxb3PVkc2WJ/7VaVv9y+JbqRJSKxIWYBsGcApgBHdjayOKNmHUlqbcp8A==" # copy value from the app registration
 
 fenixLoginpage= "https://fenix.tecnico.ulisboa.pt/oauth/userdialog?client_id=%s&redirect_uri=%s"
 fenixacesstokenpage = 'https://fenix.tecnico.ulisboa.pt/oauth/access_token'
@@ -58,7 +58,7 @@ def userAuthenticated():
 
     #first we get the secret code retuner by the FENIX login
     code = request.args['code']
-    print ("code "+request.args['code'])
+    print ("code " + request.args['code'])
 
 
     # we now retrieve a fenix access token
@@ -92,4 +92,4 @@ def userAuthenticated():
         return 'oops'
 
 if __name__ == '__main__':
-    app.run(port=10000)
+    app.run(port=5000)
