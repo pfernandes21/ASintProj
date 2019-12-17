@@ -5,7 +5,7 @@ from flask import jsonify, Markup
 import requests
 import os
 import pickle
-
+from json2html import *
 from datetime import date
 
 import sys
@@ -115,7 +115,8 @@ def htmlPages(NameService,path=None):
         res = requests.get(url)
         if res.status_code == 200:
             data = res.json()
-            resHtml = jsonToHtml(data['info'],2)
+            resHtml = json2html.convert(json = data['info'])
+            #resHtml = jsonToHtml(data['info'],2)
             value = Markup(resHtml)
             return render_template("HTMLTemplate.html", html = value, obj=res.json(), url=url)
     
