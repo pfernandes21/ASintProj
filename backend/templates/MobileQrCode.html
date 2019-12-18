@@ -44,15 +44,6 @@
             <button id="Scan-button">Press to scan</button>
             <br>
         </div>
-        <b>Detected QR code: </b>
-        <span id="cam-qr-result">None</span>
-        <br>
-        <b>Last detected at: </b>
-        <span id="cam-qr-result-timestamp"></span>
-        <br>
-        <b>Detected API of QRcode</b>
-        <span id="api-cam-qr-result">None</span>
-        <hr>
         
         <div id="where-info-qrcode-will-be-put">
 
@@ -64,10 +55,6 @@
             const video = document.getElementById('qr-video');
             const camHasCamera = document.getElementById('cam-has-camera');
             const camScann = document.getElementById('cam-scann');
-            const camQrResult = document.getElementById('cam-qr-result');
-            const APIQrResult = document.getElementById('api-cam-qr-result');
-            const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
-            const ContentResult = document.getElementById('where-info-qrcode-will-be-put');
             function jsonToHtml(resJson,h){
                 var resHtml = '';
                 var key,element,array = false;
@@ -99,13 +86,8 @@
 
             // From the Scanner retrieve tha URL and send REST to the API.
             // After receive the information present to the user
-            function setResult(label, result,API) {
+            function setResult( result) {
                 var date = new Date();
-                label.textContent = result;
-                camQrResultTimestamp.textContent = date.toString();
-                label.style.color = 'teal';
-                clearTimeout(label.highlightTimeout);
-                label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
                 var url = result.toString();
                 var path = url.substring(0,url.indexOf('get') + 'API/');
                 var url_split = url.split('/');
@@ -123,7 +105,6 @@
                 }
                 scanner.stop();
                 camScann.textContent = 'Scanning is close'
-                API.textContent = semi_path;
                 $.ajax({
                     type: "get",
                     url: semi_path,
@@ -139,7 +120,7 @@
             
             // ####### Web Cam Scanning #######
             QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
-            const scanner = new QrScanner(video, result => setResult(camQrResult, result,APIQrResult,ContentResult));
+            const scanner = new QrScanner(video, result => setResult(result));
             // scanner.start();
             document.getElementById('inversion-mode-select').addEventListener('change', event => {
                 scanner.setInversionMode(event.target.value);
