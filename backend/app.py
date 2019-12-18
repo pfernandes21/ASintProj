@@ -57,7 +57,7 @@ def log():
     log = {}
     uri = "%s/logs"%(tableOfMicroservices['Log'])
     log['dia'] = date.today().strftime("%d/%m/%Y")
-    log['info'] = ('Server %s %s')%(request.method, request.url)
+    log['info'] = ('Server IP: %s %s %s')%(request.remote_addr,request.method, request.url)
     data['data'] = log
     try:
         r = requests.post(uri, json=data)
@@ -409,6 +409,11 @@ def addMicroservice():
             return redirect(url_for('configFile', message = "Success"))
     return redirect(url_for('configFile', message = "Failed"))
 
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('main'))
+
 ##################APLICAÇÃO MOBILE################################
 @app.route("/mobile/qrcode")
 def mobileQrCode():
@@ -442,7 +447,7 @@ def private_page():
             
             return render_template("MobileSecret.html", secret = secret)
         else:
-            return "oops"
+            return render_template("MobileSecret.html", secret = None)
 
 @app.route('/mobile/userAuth')
 def userAuthenticated():
@@ -466,7 +471,6 @@ def userAuthenticated():
         params = {'access_token': r_token['access_token']}
         resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
         r_info = resp.json()
-        print( r_info)
 
         # we store it
         session['loginName'] = r_info['username']
@@ -478,7 +482,7 @@ def userAuthenticated():
         #but we could redirect the user to the private page
         return redirect('/mobile/secret') #comment the return jsonify....
     else:
-        return 'oops'
+        return redirect(url_for('main'))
 
 @app.route('/mobile/who', methods = ['POST', 'GET'])
 def who():
@@ -519,6 +523,18 @@ def who():
             else:
                 return jsonify({'username': session.get('loginName'), 'name': None, 'photo': None})
 
+@app.route('/mobile/logout', methods = ['POST'])
+def mobile_logout():
+    print("hello")
+    if request.form['secret'] is not None:
+        del secrets[request.form['secret']]
+        session.pop('loginName', None)
+        return redirect(url_for("main"))
+
+    else:
+        resp = jsonify("Acesso não autorizado")
+        resp.status_code = 401
+        return resp
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

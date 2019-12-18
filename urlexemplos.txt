@@ -7,7 +7,7 @@ http://127.0.0.1:5000/getrooms/building=2448131361091  - Torre Norte
 http://127.0.0.1:5000/getrooms/building=2448131361060  - Pavilhão Central
 
 http://127.0.0.1:5000/getcanteen                     - Ementa da semana 
-http://127.0.0.1:5000/getcanteen/day=today                     - Ementa do dia
+http://127.0.0.1:5000/getcanteen/day=today           - Ementa do dia
 
 http://127.0.0.1:5000/getsecretariats/secretariat=8c51bbd8-1e73-11ea-8bba-1cb72c295802
 http://127.0.0.1:5000/getsecretariats/secretariat=c0f8dcec-1e73-11ea-b36b-1cb72c295802
