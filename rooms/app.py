@@ -28,7 +28,7 @@ def log():
     data = {}
     log = {}
     log['dia'] = date.today().strftime("%d/%m/%Y")
-    log['info'] = ('Rooms %s %s')%(request.method, request.url)
+    log['info'] = ('Rooms IP: %s %s %s')%(request.remote_addr,request.method, request.url)
     data['data'] = log
     try:
         r = requests.post(uri, json=data)
