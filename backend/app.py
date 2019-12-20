@@ -210,7 +210,12 @@ def microservices_API(microservice, path=None):
 
     return resp
 
-##################ADMIN/LOG################################
+###########################################################
+###########################################################
+######################ADMIN/LOG############################
+###########################################################
+###########################################################
+
 @app.route('/admin')
 def admin_main():
     return render_template('mainadmin.html')
@@ -419,9 +424,9 @@ def admin_logout():
 def mobileQrCode():
     return render_template("MobileQrCode.html")
 
-@app.route("/mobile/showroomsecretariats")
-def mobileShowRoomSecretariats():
-    return render_template("MobileShowRoomSecretariat.html") 
+# @app.route("/mobile/showroomsecretariats")
+# def mobileShowRoomSecretariats():
+#     return render_template("MobileShowRoomSecretariat.html") 
 
 @app.route('/mobile/secret')
 def private_page():
@@ -455,18 +460,17 @@ def userAuthenticated():
 
     #first we get the secret code retuner by the FENIX login
     code = request.args['code']
-    print ("code " + request.args['code'])
+    # print ("code " + request.args['code'])
 
     # we now retrieve a fenix access token
     payload = {'client_id': client_id, 'client_secret': clientSecret, 'redirect_uri' : redirect_uri, 'code' : code, 'grant_type': 'authorization_code'}
     response = requests.post(fenixacesstokenpage, params = payload)
-    print (response.url)
-    print (response.status_code)
+    # print (response.url)
+    # print (response.status_code)
     if(response.status_code == 200):
         #if we receive the token
-        print ('getting user info')
+        # print ('getting user info')
         r_token = response.json()
-        print(r_token)
 
         params = {'access_token': r_token['access_token']}
         resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
@@ -503,8 +507,9 @@ def who():
            
             secrets[secret2] = [secrets[secret][0], False, None] 
             resp = jsonify({'secret':secret2,'dataUser':secrets[secret][2]})
-            del secrets[secret]
 
+            del secrets[secret]
+            
             return resp
         elif request.method == 'POST':
             
@@ -525,9 +530,11 @@ def who():
 
 @app.route('/mobile/logout', methods = ['POST'])
 def mobile_logout():
-    print("hello")
     if request.form['secret'] is not None:
-        del secrets[request.form['secret']]
+        try:
+            del secrets[request.form['secret']]
+        except:
+            pass
         session.pop('loginName', None)
         return redirect(url_for("main"))
 
