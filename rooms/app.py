@@ -101,11 +101,12 @@ def room_event_type(roomid, eventtype):
         resp = jsonify("Not Found")
         resp.status_code = 404
         return resp
-
+    
+    eventtype = eventtype.upper()
     get_events(data, eventtype, None)
 
     try:
-        resp = jsonify(data)
+        resp = jsonify(format_room(data))
         resp.status_code = 200
     except Exception as e:
         print(e)
@@ -114,7 +115,7 @@ def room_event_type(roomid, eventtype):
 
     return resp
 
-@app.route('/room/<int:roomid>/events/<eventdate>')
+@app.route('/room/<int:roomid>/events/date/<path:eventdate>')
 def room_event_date(roomid, eventdate):
     r = requests.get(URI + "/" + str(roomid))
     data = r.json()
@@ -127,7 +128,7 @@ def room_event_date(roomid, eventdate):
     get_events(data, None, eventdate)
 
     try:
-        resp = jsonify(data)
+        resp = jsonify(format_room(data))
         resp.status_code = 200
     except Exception as e:
         print(e)
@@ -136,7 +137,7 @@ def room_event_date(roomid, eventdate):
 
     return resp
 
-@app.route('/room/<int:roomid>/events/<eventtype>/<eventdate>')
+@app.route('/room/<int:roomid>/events/<eventtype>/<path:eventdate>')
 def room_event_type_date(roomid, eventtype, eventdate):
     r = requests.get(URI + "/" + str(roomid))
     data = r.json()
@@ -145,11 +146,12 @@ def room_event_type_date(roomid, eventtype, eventdate):
         resp = jsonify("Not Found")
         resp.status_code = 404
         return resp
-
+    
+    eventtype = eventtype.upper()
     get_events(data, eventtype, eventdate)
 
     try:
-        resp = jsonify(data)
+        resp = jsonify(format_room(data))
         resp.status_code = 200
     except Exception as e:
         print(e)
@@ -158,12 +160,18 @@ def room_event_type_date(roomid, eventtype, eventdate):
 
     return resp
 
-def get_events(room, type, date):
+def get_events(room, tipo, date):
     target_events = []
     events = room['events']
-
+    
     for event in events:
-        if(event['type'] == type or event['day'] == date or (type == None and date == None)):
+        if (tipo == None and date == None):
+            target_events.append(format_event(event))
+        elif event['type'] == tipo and date == None:
+            target_events.append(format_event(event))
+        elif tipo == None and event['day'] == date:
+            target_events.append(format_event(event))
+        elif event['type'] == tipo and event['day'] == date:
             target_events.append(format_event(event))
     
     room['events'] = target_events
@@ -219,6 +227,6 @@ def format_floor(floor):
 
 if __name__ == '__main__':
     # app.run()
+    # app.run(debug=True)
     cfg = config.Rooms()
     app.run(debug=True, host=cfg.host, port=cfg.port)
-    # app.run(debug=True)
