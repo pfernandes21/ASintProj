@@ -3,6 +3,11 @@ http://127.0.0.1:5000/getrooms/room=2448131362971    - SALA EA1
 http://127.0.0.1:5000/getrooms/room=2448131362979    - SALA EA2
 http://127.0.0.1:5000/getrooms/room=2448131362251    - SALA C01
 
+http://127.0.0.1:5000/getrooms/room=2448131362251/events/date/20/12/2019 - SALA C01 dia 20/12/2019
+http://127.0.0.1:5000/getrooms/room=2448131362251/events/lesson          - SALA C01 lesson
+http://127.0.0.1:5000/getrooms/room=2448131362251/events/lesson/20/12/2019 - SALA C01 lesson 20/12/2019
+
+
 http://127.0.0.1:5000/getrooms/building=2448131361091  - Torre Norte
 http://127.0.0.1:5000/getrooms/building=2448131361060  - Pavilhão Central
 
