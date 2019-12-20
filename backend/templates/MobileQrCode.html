@@ -62,10 +62,6 @@
                     for (key in resJson)
                     {
                         element = Number(key)
-                        console.log("new Iteration")
-                        console.log(typeof(key))
-                        console.log(key)
-                        console.log(element)
                         if( element.toString() !== 'NaN')
                         {    
                             resHtml += '<ul>'
@@ -102,6 +98,9 @@
                         path[1] = dd + mm + yyyy;
                     }
                     semi_path = semi_path +'/' + path[0]+'/'+path[1];
+                    for( var i = 5; i < url_split.length; i++)
+                        semi_path += '/' + url_split[i];
+                    console.log(semi_path);
                 }
                 scanner.stop();
                 camScann.textContent = 'Scanning is close'
