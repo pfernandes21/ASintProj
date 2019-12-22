@@ -123,8 +123,9 @@ def htmlPages(NameService,path=None):
         url = 'http://127.0.0.1:5000/API/%s'%(NameService)
     else:
         path = path.split('=')
-        if path[1] == 'today':
-            path[1] = date.today().strftime("%d%m%Y")
+        if 'today' in path[1]:
+            i = path[1].index('today')
+            path[1] = path[1][:i] + date.today().strftime("%d/%m/%Y") + path[1][i+5+1:]
         try:
             url = 'http://127.0.0.1:5000/API/%s/%s/%s'%(NameService,path[0],path[1])
         except:

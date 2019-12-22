@@ -85,7 +85,7 @@
             function setResult( result) {
                 var date = new Date();
                 var url = result.toString();
-                var path = url.substring(0,url.indexOf('get') + 'API/');
+                console.log(url)
                 var url_split = url.split('/');
                 var nameService = url_split[3].substring(3);
                 var semi_path = url.substring(0,url.indexOf('get')) + 'API/'+nameService;
@@ -95,7 +95,14 @@
                         var dd = String(date.getDate()).padStart(2,'0');
                         var mm = String(date.getMonth()+1).padStart(2,'0');
                         var yyyy = date.getFullYear();
-                        path[1] = dd + mm + yyyy;
+                        path[1] = dd + '/' +mm + '/' + yyyy;
+                    }
+                    if(url_split.indexOf('today') != -1)
+                    {
+                        var dd = String(date.getDate()).padStart(2,'0');
+                        var mm = String(date.getMonth()+1).padStart(2,'0');
+                        var yyyy = date.getFullYear();
+                        url_split[url_split.indexOf('today')] = dd + '/' +mm + '/' + yyyy;
                     }
                     semi_path = semi_path +'/' + path[0]+'/'+path[1];
                     for( var i = 5; i < url_split.length; i++)
