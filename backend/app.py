@@ -190,7 +190,6 @@ def microservices_API(microservice, path=None):
             r = requests.get(URL)
 
         elif(request.method == 'POST'):
-            print(request.get_json())
             r = requests.post(URL, json = request.get_json())
 
         elif(request.method == 'PUT'):
@@ -240,7 +239,6 @@ def showLogs():
         url = ("%s/%s")%(uri,str(request.form['numberOfLogs']))
     except:
         url = uri
-    print(url)
     r = requests.get(url)
     if r.status_code != 200:
         return redirect(url_for('admin_main'))
@@ -261,7 +259,6 @@ def changeSecretariat():
     """
     try:
         obj = request.args['message']
-        print(obj)
     except:
         obj = None
 
@@ -371,7 +368,6 @@ def configFile():
     """
     try:
         obj = request.args['message']
-        print(obj)
     except:
         obj = None
 

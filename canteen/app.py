@@ -141,14 +141,12 @@ def orderTheData(data):
     date = []
     for key in data:
         date.append(datetime.strptime(str(key),"%d/%m/%Y"))
-    print(date)
     newData = {}
     for key in sorted(date):
         stringDate = datetime.strftime(key,"%d/%m/%Y")
         if stringDate[0] == '0':
             stringDate = stringDate[1:]
         newData[stringDate] = data[stringDate]
-    print(newData)
 
     return newData
 

@@ -80,6 +80,4 @@ class DBSecretariat:
         """
         Return the secretariat that has an id equals to the argument id
         """
-        print(id)
-        print(self.db[str(id)])
         return self.db[id]

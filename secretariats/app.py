@@ -97,7 +97,6 @@ def APIDeleteSecretariat(secretariatid):
 @app.route('/secretariat/<secretariatid>', methods=['PUT'])
 def APIChangeSecretariat(secretariatid):
     if request.is_json:
-        print(request.json)
         try:
             for i in range(len(request.json['key'])):
                 flag = db.changeSecretariat(secretariatid,request.json['key'][i],request.json['value'][i])
