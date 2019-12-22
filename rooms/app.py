@@ -15,7 +15,7 @@ from datetime import date
 app = Flask(__name__)
 db = roomsCache.Cache("")
 
-URI = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces"
+FenixSpacesAPI_URL = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces"
 
 Log = config.Log()
 uri = "http://%s:%d/logs"%(Log.host,Log.port)
@@ -43,124 +43,173 @@ def log():
     
 @app.route('/building/<int:buildingid>')
 def buildings(buildingid):
+    """
+    Return the rooms of a building
+    """
     if db.checkCache(buildingid):
         resp = jsonify(db.showCache(buildingid))
         resp.status_code = 200
-    else:
-        r = requests.get(URI + "/" + str(buildingid))
+
+    try:
+        r = requests.get(FenixSpacesAPI_URL + "/" + str(buildingid))
         data = r.json()
 
         if(data['type'] != 'BUILDING'):
             resp = jsonify("Not Found")
             resp.status_code = 404
-            return resp
+        else:
+            list_rooms = {}
+            rooms = getRooms(data)
+            list_rooms['name'] = 'Building %s'%(data['name'])
+            list_rooms['info'] = rooms
 
-        list_rooms = {}
-        rooms = getRooms(data)
-        list_rooms['name'] = 'Building %s'%(data['name'])
-        list_rooms['info'] = rooms
-
-        try:
             db.add(buildingid, list_rooms)
             resp = jsonify(list_rooms)
             resp.status_code = 200
-        except Exception as e:
-            print(e)
-            resp = jsonify("Unsuccess")
-            resp.status_code = 400
-    return resp
-
-@app.route('/room/<int:roomid>')
-def room(roomid):
-    r = requests.get(URI + "/" + str(roomid))
-    data = r.json()
-
-    if(data['type'] != 'ROOM'):
-        resp = jsonify("Not Found")
-        resp.status_code = 404
-        return resp
-
-    get_events(data,None,None)
-        
-    try:
-        resp = jsonify(format_room(data))
-        resp.status_code = 200
     except Exception as e:
         print(e)
         resp = jsonify("Unsuccess")
         resp.status_code = 400
+    return resp
+
+@app.route('/room/<int:roomid>')
+def room(roomid):
+    """
+    Return the info of a room
+    """
+    if db.checkCache(roomid):
+        data = db.showCache(roomid)
+        get_events(data["info"],None,None)
+        resp = jsonify(data)
+        resp.status_code = 200
+    else:
+        try:
+            r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid))
+            data = r.json()
+
+            if(data['type'] != 'ROOM'):
+                resp = jsonify("Not Found")
+                resp.status_code = 404
+
+            else:
+                data = format_room(data)
+                db.add(roomid, data)
+                get_events(data["info"],None,None)
+                resp = jsonify(data)
+                resp.status_code = 200
+
+        except Exception as e:
+            print(e)
+            resp = jsonify("Unsuccess")
+            resp.status_code = 400
 
     return resp
 
 @app.route('/room/<int:roomid>/events/<eventtype>')
 def room_event_type(roomid, eventtype):
-    r = requests.get(URI + "/" + str(roomid))
-    data = r.json()
-
-    if(data['type'] != 'ROOM'):
-        resp = jsonify("Not Found")
-        resp.status_code = 404
-        return resp
-    
-    eventtype = eventtype.upper()
-    get_events(data, eventtype, None)
-
-    try:
-        resp = jsonify(format_room(data))
+    """
+    Return the info of a room with a certain type of event
+    """
+    if db.checkCache(roomid):
+        data = db.showCache(roomid)
+        get_events(data["info"],eventtype,None)
+        resp = jsonify(data)
         resp.status_code = 200
-    except Exception as e:
-        print(e)
-        resp = jsonify("Unsuccess")
-        resp.status_code = 400
+    else:
+        try:
+            r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid))
+            data = r.json()
+
+            if(data['type'] != 'ROOM'):
+                resp = jsonify("Not Found")
+                resp.status_code = 404
+
+            else:
+                data = format_room(data)
+                db.add(roomid, data)
+                get_events(data["info"],eventtype,None)
+                resp = jsonify(data)
+                resp.status_code = 200
+
+        except Exception as e:
+            print(e)
+            resp = jsonify("Unsuccess")
+            resp.status_code = 400
 
     return resp
 
 @app.route('/room/<int:roomid>/events/date/<path:eventdate>')
 def room_event_date(roomid, eventdate):
-    r = requests.get(URI + "/" + str(roomid))
-    data = r.json()
-
-    if(data['type'] != 'ROOM'):
-        resp = jsonify("Not Found")
-        resp.status_code = 404
-        return resp
-
-    get_events(data, None, eventdate)
-
-    try:
-        resp = jsonify(format_room(data))
+    """
+    Return the info of a room with a certain date of event
+    """
+    if db.checkCache(roomid):
+        data = db.showCache(roomid)
+        get_events(data,None,eventdate)
+        resp = jsonify(data)
         resp.status_code = 200
-    except Exception as e:
-        print(e)
-        resp = jsonify("Unsuccess")
-        resp.status_code = 400
+    else:
+        try:
+            r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid))
+            data = r.json()
+
+            if(data['type'] != 'ROOM'):
+                resp = jsonify("Not Found")
+                resp.status_code = 404
+
+            else:
+                data = format_room(data)
+                db.add(roomid, data)
+                get_events(data["info"],None,eventdate)
+                resp = jsonify(data)
+                resp.status_code = 200
+
+        except Exception as e:
+            print(e)
+            resp = jsonify("Unsuccess")
+            resp.status_code = 400
 
     return resp
 
 @app.route('/room/<int:roomid>/events/<eventtype>/<path:eventdate>')
 def room_event_type_date(roomid, eventtype, eventdate):
-    r = requests.get(URI + "/" + str(roomid))
-    data = r.json()
-
-    if(data['type'] != 'ROOM'):
-        resp = jsonify("Not Found")
-        resp.status_code = 404
-        return resp
-    
-    eventtype = eventtype.upper()
-    get_events(data, eventtype, eventdate)
-
-    try:
-        resp = jsonify(format_room(data))
+    """
+    Return the info of a room with a certain type and date of event
+    """
+    if db.checkCache(roomid):
+        data = db.showCache(roomid)
+        get_events(data,eventtype,eventdate)
+        resp = jsonify(data)
         resp.status_code = 200
-    except Exception as e:
-        print(e)
-        resp = jsonify("Unsuccess")
-        resp.status_code = 400
+    else:
+        try:
+            r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid))
+            data = r.json()
+
+            if(data['type'] != 'ROOM'):
+                resp = jsonify("Not Found")
+                resp.status_code = 404
+
+            else:
+                data = format_room(data)
+                db.add(roomid, data)
+                get_events(data["info"],eventtype,eventdate)
+                resp = jsonify(data)
+                resp.status_code = 200
+
+        except Exception as e:
+            print(e)
+            resp = jsonify("Unsuccess")
+            resp.status_code = 400
 
     return resp
 
 def get_events(room, tipo, date):
+    """
+    Filter the events of a room
+    """
+    if(type(tipo) is str):
+        tipo = tipo.upper()
     target_events = []
     events = room['events']
     
@@ -178,11 +227,14 @@ def get_events(room, tipo, date):
 
 
 def getRooms(building_data):
+    """
+    Get the rooms from all floors of a building
+    """
     rooms = []
     floors = building_data['containedSpaces']
     for floor in floors:
         if(floor['type'] == 'FLOOR'):
-            r = requests.get(URI + "/" + str(floor['id']))
+            r = requests.get(FenixSpacesAPI_URL + "/" + str(floor['id']))
             floor_data = r.json()
             for floor_rooms in floor_data['containedSpaces']:
                 if(floor_rooms['type'] == 'ROOM'):
@@ -190,6 +242,9 @@ def getRooms(building_data):
     return rooms
 
 def format_event(event):
+    """
+    Filter information of an event
+    """
     del event['period']
     try:
         name= ""
@@ -210,6 +265,9 @@ def format_event(event):
     return event
 
 def format_room(room):
+    """
+    Filter information of a room
+    """
     new = {}
     new["name"] = "Room"
     new["info"] = {}
@@ -219,6 +277,9 @@ def format_room(room):
     return new
 
 def format_floor(floor):
+    """
+    Filter information of a floor
+    """
     new = {}
     for key in floor:
         if key != "containedSpaces" and key != "topLevelSpace" and key != "parentSpace" and key != 'type':
