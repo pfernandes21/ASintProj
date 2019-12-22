@@ -10,7 +10,7 @@ import sys
 sys.path.append(".")
 import config
 
-from datetime import date
+from datetime import date, datetime
 
 app = Flask(__name__)
 db = roomsCache.Cache("")
@@ -143,14 +143,21 @@ def room_event_date(roomid, eventdate):
     """
     Return the info of a room with a certain date of event
     """
-    if db.checkCache(roomid):
+    try:
+        in_current_week = same_week(datetime.strptime(eventdate, "%d/%m/%Y"))
+    except:
+        resp = jsonify("Wrong date format -- %d/%m/%Y")
+        resp.status_code = 400
+        return resp
+
+    if in_current_week and db.checkCache(roomid):
         data = db.showCache(roomid)
         get_events(data["info"],None,eventdate)
         resp = jsonify(data)
         resp.status_code = 200
     else:
         try:
-            r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid))
+            r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid) + "?day=" + eventdate)
             data = r.json()
 
             if(data['type'] != 'ROOM'):
@@ -159,7 +166,8 @@ def room_event_date(roomid, eventdate):
 
             else:
                 data = format_room(data)
-                db.add(roomid, data)
+                if in_current_week:
+                    db.add(roomid, data)
                 get_events(data["info"],None,eventdate)
                 resp = jsonify(data)
                 resp.status_code = 200
@@ -176,14 +184,21 @@ def room_event_type_date(roomid, eventtype, eventdate):
     """
     Return the info of a room with a certain type and date of event
     """
-    if db.checkCache(roomid):
+    try:
+        in_current_week = same_week(datetime.strptime(eventdate, "%d/%m/%Y"))
+    except:
+        resp = jsonify("Wrong date format -- %d/%m/%Y")
+        resp.status_code = 400
+        return resp
+
+    if in_current_week and db.checkCache(roomid):
         data = db.showCache(roomid)
         get_events(data["info"],eventtype,eventdate)
         resp = jsonify(data)
         resp.status_code = 200
     else:
         try:
-            r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid))
+            r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid) + "?day=" + eventdate)
             data = r.json()
 
             if(data['type'] != 'ROOM'):
@@ -192,7 +207,8 @@ def room_event_type_date(roomid, eventtype, eventdate):
 
             else:
                 data = format_room(data)
-                db.add(roomid, data)
+                if in_current_week:
+                    db.add(roomid, data)
                 get_events(data["info"],eventtype,eventdate)
                 resp = jsonify(data)
                 resp.status_code = 200
@@ -263,6 +279,11 @@ def format_event(event):
         pass
 
     return event
+
+def same_week(event_date):
+    today = datetime.now()
+
+    return int(today.strftime("%W")) == int(event_date.strftime("%W"))
 
 def format_room(room):
     """
