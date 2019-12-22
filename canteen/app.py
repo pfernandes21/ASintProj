@@ -74,7 +74,7 @@ def APIMenusByType(tipo):
     """
     if tipo.lower() == "almoco":
         tipo = "almoço"
-    if db.checkCache(date):
+    if db.checkCache(date.today().strftime("%d/%m/%Y")):
         resp = jsonify(db.transform(None,tipo))
         resp.status_code = 200
     else:
@@ -89,22 +89,21 @@ def APIMenusByType(tipo):
             resp.status_code = 400
     return resp
 
-@app.route('/day/<int:menudate>')
-@app.route('/dia/<int:menudate>')
+@app.route('/day/<path:menudate>')
+@app.route('/dia/<path:menudate>')
 def APIMenusByDay(menudate):
     """
     Return the menu of a day
     """
-    date = format_date(menudate)
-    if db.checkCache(date):
-        resp = jsonify(db.transform(date,None))
+    if db.checkCache(menudate):
+        resp = jsonify(db.transform(menudate,None))
         resp.status_code = 200
     else:
-        uri = URI + "?day=%s"%(date)
+        uri = URI + "?day=%s"%(menudate)
         r = requests.get(uri)
         data = r.json()
         try:
-            resp = jsonify(format_message(data,None,date))
+            resp = jsonify(format_message(data,None,menudate))
             resp.status_code = 200
         except Exception as e:
             print(e)
@@ -112,23 +111,22 @@ def APIMenusByDay(menudate):
             resp.status_code = 400
     return resp
 
-@app.route('/<tipo>/<int:menudate>')
+@app.route('/<tipo>/<path:menudate>')
 def APIMenusByTypeByDay(tipo,menudate):
     """
     Return one menu of a day ( lunch or dinner )
     """
     if tipo.lower() == "almoco":
         tipo = "almoço"
-    date = format_date(menudate)
-    if db.checkCache(date):
-        resp = jsonify(db.transform(date,tipo))
+    if db.checkCache(menudate):
+        resp = jsonify(db.transform(menudate,tipo))
         resp.status_code = 200
     else:
-        uri = URI + "?day=%s"%(date)
+        uri = URI + "?day=%s"%(menudate)
         r = requests.get(uri)
         data = r.json()
         try:
-            resp = jsonify(format_message(data,tipo,date))
+            resp = jsonify(format_message(data,tipo,menudate))
             resp.status_code = 200
         except Exception as e:
             print(e)
