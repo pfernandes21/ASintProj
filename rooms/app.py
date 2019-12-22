@@ -283,7 +283,7 @@ def format_event(event):
 def same_week(event_date):
     today = datetime.now()
 
-    return int(today.strftime("%W")) == int(event_date.strftime("%W"))
+    return int(today.strftime("%U")) == int(event_date.strftime("%U"))
 
 def format_room(room):
     """
