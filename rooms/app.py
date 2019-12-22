@@ -145,7 +145,7 @@ def room_event_date(roomid, eventdate):
     """
     if db.checkCache(roomid):
         data = db.showCache(roomid)
-        get_events(data,None,eventdate)
+        get_events(data["info"],None,eventdate)
         resp = jsonify(data)
         resp.status_code = 200
     else:
@@ -178,7 +178,7 @@ def room_event_type_date(roomid, eventtype, eventdate):
     """
     if db.checkCache(roomid):
         data = db.showCache(roomid)
-        get_events(data,eventtype,eventdate)
+        get_events(data["info"],eventtype,eventdate)
         resp = jsonify(data)
         resp.status_code = 200
     else:
