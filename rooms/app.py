@@ -168,7 +168,7 @@ def room_event_date(roomid, eventdate):
                 data = format_room(data)
                 if in_current_week:
                     db.add(roomid, data)
-                get_events(data["info"],None,eventdate)
+                get_events(data["info"],None,datetime.strptime(eventdate, "%d/%m/%Y"))
                 resp = jsonify(data)
                 resp.status_code = 200
 
@@ -198,6 +198,7 @@ def room_event_type_date(roomid, eventtype, eventdate):
         resp.status_code = 200
     else:
         try:
+            print("t: ", FenixSpacesAPI_URL + "/" + str(roomid) + "?day=" + eventdate)
             r = requests.get(FenixSpacesAPI_URL + "/" + str(roomid) + "?day=" + eventdate)
             data = r.json()
 
@@ -209,7 +210,7 @@ def room_event_type_date(roomid, eventtype, eventdate):
                 data = format_room(data)
                 if in_current_week:
                     db.add(roomid, data)
-                get_events(data["info"],eventtype,eventdate)
+                get_events(data["info"],eventtype,datetime.strptime(eventdate, "%d/%m/%Y"))
                 resp = jsonify(data)
                 resp.status_code = 200
 
@@ -234,9 +235,9 @@ def get_events(room, tipo, date):
             target_events.append(format_event(event))
         elif event['type'] == tipo and date == None:
             target_events.append(format_event(event))
-        elif tipo == None and event['day'] == date:
+        elif tipo == None and datetime.strptime(event['day'], "%d/%m/%Y") == date:
             target_events.append(format_event(event))
-        elif event['type'] == tipo and event['day'] == date:
+        elif event['type'] == tipo and datetime.strptime(event['day'], "%d/%m/%Y") == date:
             target_events.append(format_event(event))
     
     room['events'] = target_events
@@ -283,7 +284,7 @@ def format_event(event):
 def same_week(event_date):
     today = datetime.now()
 
-    return int(today.strftime("%U")) == int(event_date.strftime("%U"))
+    return (int(today.strftime("%U")) == int(event_date.strftime("%U"))) and (int(today.strftime("%Y")) == int(event_date.strftime("%Y")))
 
 def format_room(room):
     """
