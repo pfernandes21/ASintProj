@@ -93,28 +93,44 @@ def APIMenusByType(tipo,menudate = None):
                 resp.status_code = 400
     return resp
 
+@app.route('/dia/<path:menudate>/<tipo>')  
+@app.route('/day/<path:menudate>/<tipo>')
 @app.route('/day/<path:menudate>')
 @app.route('/dia/<path:menudate>')
-def APIMenusByDay(menudate):
+def APIMenusByDay(menudate,tipo = None):
     """
     Return the menu of a day
     """
-    if menudate[3] == '0':
-        menudate = menudate[0:3] + menudate[4:]
-    if db.checkCache(menudate):
-        resp = jsonify(db.transform(menudate,None))
-        resp.status_code = 200
+    
+    try:
+        int(tipo)
+    except:
+        pass
     else:
-        uri = URI + "?day=%s"%(menudate)
-        r = requests.get(uri)
-        data = r.json()
-        try:
-            resp = jsonify(format_message(data,None,menudate))
+        menudate += '/' + tipo
+        tipo = None
+
+    if tipo != None:
+        if tipo.lower() == "almoco":
+            tipo = "almoço"
+        resp = APIMenusByTypeByDay(tipo,menudate)
+    else:
+        if menudate[3] == '0':
+            menudate = menudate[0:3] + menudate[4:]
+        if db.checkCache(menudate):
+            resp = jsonify(db.transform(menudate,None))
             resp.status_code = 200
-        except Exception as e:
-            print(e)
-            resp = jsonify("Unsuccess")
-            resp.status_code = 400
+        else:
+            uri = URI + "?day=%s"%(menudate)
+            r = requests.get(uri)
+            data = r.json()
+            try:
+                resp = jsonify(format_message(data,None,menudate))
+                resp.status_code = 200
+            except Exception as e:
+                print(e)
+                resp = jsonify("Unsuccess")
+                resp.status_code = 400
     return resp
 
 @app.route('/<tipo>/<path:menudate>')
