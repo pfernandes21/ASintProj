@@ -122,16 +122,19 @@ def htmlPages(NameService,path=None):
     if path == None:
         url = 'http://127.0.0.1:5000/API/%s'%(NameService)
     else:
-        path = path.split('=')
-        if 'today' in path[1]:
-            i = path[1].index('today')
-            path[1] = path[1][:i] + date.today().strftime("%d/%m/%Y") + path[1][i+5+1:]
-        try:
-            url = 'http://127.0.0.1:5000/API/%s'%(NameService)
-            for p in path:
-                url = '%s/%s'%(url,p)
-        except:
-            url = None
+        if '=' in path:
+            path = path.split('=')
+            if 'today' in path[1]:
+                i = path[1].index('today')
+                path[1] = path[1][:i] + date.today().strftime("%d/%m/%Y") + path[1][i+5+1:]
+            try:
+                url = 'http://127.0.0.1:5000/API/%s'%(NameService)
+                for p in path:
+                    url = '%s/%s'%(url,p)
+            except:
+                url = None
+        else:
+            url = 'http://127.0.0.1:5000/API/%s/%s'%(NameService,path)
     
     if url != None:
         res = requests.get(url)
