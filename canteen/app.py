@@ -95,6 +95,8 @@ def APIMenusByDay(menudate):
     """
     Return the menu of a day
     """
+    if menudate[3] == '0':
+        menudate = menudate[0:3] + menudate[4:]
     if db.checkCache(menudate):
         resp = jsonify(db.transform(menudate,None))
         resp.status_code = 200
@@ -116,6 +118,8 @@ def APIMenusByTypeByDay(tipo,menudate):
     """
     Return one menu of a day ( lunch or dinner )
     """
+    if menudate[3] == '0':
+        menudate = menudate[0:3] + menudate[4:]
     if tipo.lower() == "almoco":
         tipo = "almoço"
     if db.checkCache(menudate):
@@ -144,6 +148,8 @@ def orderTheData(data):
     newData = {}
     for key in sorted(date):
         stringDate = datetime.strftime(key,"%d/%m/%Y")
+        if stringDate[3] == '0':
+            stringDate = stringDate[0:3] + stringDate[4:] 
         if stringDate[0] == '0':
             stringDate = stringDate[1:]
         newData[stringDate] = data[stringDate]
