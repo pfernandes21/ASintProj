@@ -67,26 +67,30 @@ def APIMenus():
             resp.status_code = 400
     return resp
 
+@app.route('/type/<tipo>/day/<path:menudate>')
 @app.route('/type/<tipo>')
-def APIMenusByType(tipo):
+def APIMenusByType(tipo,menudate = None):
     """
     Return all one menu of a day during a week (dinner or lunch)
     """
-    if tipo.lower() == "almoco":
-        tipo = "almoço"
-    if db.checkCache(date.today().strftime("%d/%m/%Y")):
-        resp = jsonify(db.transform(None,tipo))
-        resp.status_code = 200
+    if menudate != None:
+        resp = APIMenusByTypeByDay(tipo,menudate)
     else:
-        r = requests.get(URI)
-        data = r.json()
-        try:
-            resp = jsonify(format_message(data,tipo,None))
+        if tipo.lower() == "almoco":
+            tipo = "almoço"
+        if db.checkCache(date.today().strftime("%d/%m/%Y")):
+            resp = jsonify(db.transform(None,tipo))
             resp.status_code = 200
-        except Exception as e:
-            print(e)
-            resp = jsonify("Unsuccess")
-            resp.status_code = 400
+        else:
+            r = requests.get(URI)
+            data = r.json()
+            try:
+                resp = jsonify(format_message(data,tipo,None))
+                resp.status_code = 200
+            except Exception as e:
+                print(e)
+                resp = jsonify("Unsuccess")
+                resp.status_code = 400
     return resp
 
 @app.route('/day/<path:menudate>')
